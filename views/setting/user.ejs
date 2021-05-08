@@ -33,12 +33,6 @@
                 <div class="row row-deck row-cards">
                     <div class="card">
                         <div class="card-body">
-                            <% if (locals.alert){ %>
-                            <div class="alert alert-<%= locals.alert[0].status %>" role="alert">
-                                <h4 class="alert-title"><%= locals.alert[0].title %></h4>
-                                <div class="text-muted"><%= locals.alert[0].message %></div>
-                            </div>
-                            <% } %>
                             <form action="/api/user/<% if (locals.user){ %><%= locals.user.id %><% } %>?_method=PATCH"
                                 method="post">
                                 <div class="mb-3">
