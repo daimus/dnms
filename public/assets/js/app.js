@@ -1,0 +1,3 @@
+docReady(function () {
+  getSiteSelector();
+});

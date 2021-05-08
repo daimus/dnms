@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server - DNMS</title>
+    <!-- HEAD -->
+    <%- include('../partials/head') %>
+    <link rel="stylesheet" href="/assets/vendor/leaflet/leaflet.css">
+    <style>
+        .btn-status {
+            display: block;
+            width: 200px;
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+    <div class="page">
+        <!-- HEADER  -->
+        <%- include('../partials/header') %>
+
+        <div class="content">
+            <div class="container-xl">
+                <!-- PAGE HEADER  -->
+                <div class="page-header d-print-none">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <!-- Page pre-title -->
+                            <div class="page-pretitle">Monitor</div>
+                            <div class="page-pretitle">
+                                <h2 class="page-title">Offline Scanner</h2>
+                            </div>
+                        </div>
+                        <!-- Page title actions -->
+                    </div>
+                </div>
+                <!-- CONTENT  -->
+                <div class="row row-deck row-cards">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body row" id="offline-device-container">
+                                <div class="progress progress-sm mb-4" id="progress">
+                                    <div class="progress-bar progress-bar-indeterminate"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- FOOTER  -->
+            <%- include('../partials/footer') %>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT  -->
+    <%- include('../partials/javascript') %>
+    <script src="/assets/vendor/leaflet/leaflet.js"></script>
+    <script>
+        function serverChanged() {
+            window.location.href = "/monitor/scanner";
+        }
+        socket.emit('OFFLINE_SCANNER', {
+            count: 1,
+            live: true
+        });
+        socket.on('OFFLINE_SCANNER', function (data) {
+            if (data.offlineDevice !== undefined) {
+                let offlineDeviceCard = document.createElement('div');
+                offlineDeviceCard.classList.add('col-3', 'mb-2')
+                offlineDeviceCard.innerHTML = `<div class="card"><div class="card-body"><div class="row g-2 align-items-center"><div class="col"><h4 class="card-title m-0 mb-1"><a href="#">${data.offlineDevice.name} ${data.offlineDevice.comment !== '' ? ' -' + data.offlineDevice.comment : ''}</a></h4><div class="text-muted"></div><div class="mb-2"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-server" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><rect x="3" y="4" width="18" height="8" rx="3" /><rect x="3" y="12" width="18" height="8" rx="3" /><line x1="7" y1="8" x2="7" y2="8.01" /><line x1="7" y1="16" x2="7" y2="16.01" /></svg> <strong class="mr-4">${data.offlineDevice.connectTo}</strong></div><div class="small mt-1" id="ping-16"><span class="badge bg-red"></span> Offline</div></div></div></div></div>`;
+                document.getElementById('offline-device-container').append(offlineDeviceCard);
+            }
+
+            if (data.done !== undefined && data.done === true) {
+                document.getElementById('progress').remove()
+            }
+        })
+    </script>
+</body>
+
+</html>

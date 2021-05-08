@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server - DNMS</title>
+    <!-- HEAD -->
+    <%- include('../partials/head') %>
+</head>
+
+<body class="antialiased">
+    <div class="page">
+        <!-- HEADER  -->
+        <%- include('../partials/header') %>
+
+        <div class="content">
+            <div class="container-xl">
+                <!-- PAGE HEADER  -->
+                <div class="page-header d-print-none">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <!-- Page pre-title -->
+                            <div class="page-pretitle">Monitor</div>
+                            <div class="page-pretitle">
+                                <h2 class="page-title"><%= device.name %></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- CONTENT  -->
+                <div class="row row-deck row-cards">
+                    <div class="col-md-6 col-sm-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    Device Information
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row">
+                                    <dt class="col-5">Name: </dt>
+                                    <dd class="col-7"><%= device.name %> <%= device.comment !== '' ? '- ' + device.comment : '' %></dd>
+                                    <dt class="col-5">IP Address:</dt>
+                                    <dd class="col-7"><%= device.connectTo %></dd>
+                                    <dt class="col-5">SNMP Community:</dt>
+                                    <dd class="col-7"><%= device.snmpCommunity %></dd>
+                                    <dt class="col-5">OS:</dt>
+                                    <dd class="col-7"><%= device.os %></dd>
+                                    <dt class="col-5">Latitude/Longitude:</dt>
+                                    <dd class="col-7"><%= device.latitude %>/<%= device.longitude %></dd>
+                                </dl>
+                            </div>
+                            <% if (locals.wireless){ %>
+                            <div class="card-header" style="border-top: 1px solid rgba(101,109,119,.16);">
+                                <h3 class="card-title">
+                                    Wireless
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row">
+                                    <% if (locals.wireless.mode){ %>
+                                    <dt class="col-5">Mode :</dt>
+                                    <dd class="col-7"><%= locals.wireless.mode %></dd>
+                                    <% } %>
+
+                                    <% if (locals.wireless.ssid){ %>
+                                    <% locals.wireless.ssid.forEach((ssid, index) => { %>
+                                    <dt class="col-5">SSID [<%= index %>]:</dt>
+                                    <dd class="col-7"><%= ssid %></dd>
+                                    <% }) %>
+                                    <% } %>
+
+                                    <% if (locals.wireless.frequency){ %>
+                                    <% locals.wireless.frequency.forEach((frequency, index) => { %>
+                                    <dt class="col-5">Frequency [<%= index %>]:</dt>
+                                    <dd class="col-7"><%= frequency %></dd>
+                                    <% }) %>
+                                    <% } %>
+                                </dl>
+                            </div>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="row row-deck row-cards">
+                            <div class="col-12 mb-3 d-none" id="card-registration-table">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">
+                                            Registration Table
+                                        </h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <strong>Noise Floor: <span id="noise-floor"></span></strong>
+                                        <span class="mx-2">|</span>
+                                        <strong>Overall CCQ: <span id="overall-ccq"></span></strong>
+                                        <table class="table mt-3" id="table-registration-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Radio Name</th>
+                                                    <th>Signal Strength</th>
+                                                    <th>Uptime</th>
+                                                    <th>TX / RX</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="card d-none" id="card-traffic">
+                                    <div class="card-header">
+                                        <h3 class="card-title">
+                                            Traffic
+                                        </h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            class="icon icon-tabler icon-tabler-arrow-big-top" width="44" height="44"
+                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="#206bc4" fill="#206bc4"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path
+                                                d="M9 20v-8h-3.586a1 1 0 0 1 -.707 -1.707l6.586 -6.586a1 1 0 0 1 1.414 0l6.586 6.586a1 1 0 0 1 -.707 1.707h-3.586v8a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
+                                        </svg>
+                                        <strong><span id="tx-rate"></span></strong>
+                                        <span class="mx-2"></span>
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            class="icon icon-tabler icon-tabler-arrow-big-down" width="44" height="44"
+                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="#fc0303" fill="#fc0303"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path
+                                                d="M15 4v8h3.586a1 1 0 0 1 .707 1.707l-6.586 6.586a1 1 0 0 1 -1.414 0l-6.586 -6.586a1 1 0 0 1 .707 -1.707h3.586v-8a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1z" />
+                                        </svg>
+                                        <strong><span id="rx-rate"></span></strong>
+                                        <div id="chart-traffic" class="mt-3"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- FOOTER  -->
+            <%- include('../partials/footer') %>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT  -->
+    <%- include('../partials/javascript') %>
+    <script src="/assets/vendor/tabler/libs/apexcharts/dist/apexcharts.min.js"></script>
+    <script>
+        var trafficChart = new ApexCharts(document.getElementById('chart-traffic'), {
+            chart: {
+                type: "line",
+                fontFamily: 'inherit',
+                height: 200,
+                sparkline: {
+                    enabled: true
+                },
+                animations: {
+                    enabled: false
+                },
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            fill: {
+                opacity: .75,
+                type: 'solid'
+            },
+            stroke: {
+                width: 3,
+                lineCap: "round",
+            },
+            series: [{
+                    name: "Upload",
+                    data: []
+                },
+                {
+                    name: "Download",
+                    data: []
+                }
+            ],
+            grid: {
+                strokeDashArray: 4,
+            },
+            xaxis: {
+                labels: {
+                    padding: 0
+                },
+                tooltip: {
+                    enabled: false
+                },
+                axisBorder: {
+                    show: false,
+                }
+            },
+            tooltip: {
+                x: {
+                    show: false
+                }
+            },
+            yaxis: {
+                labels: {
+                    padding: 4
+                },
+            },
+            colors: ["#206bc4", "#fc0303"],
+            legend: {
+                show: false,
+            },
+        });
+        trafficChart.render();
+        var txRateArr = new Array(100).fill().map(() => 0);
+        var rxRateArr = new Array(100).fill().map(() => 0);
+        socket.emit('TRAFFIC', {
+            /* beautify preserve:start */
+            host: '<%= device.connectTo %>'
+            /* beautify preserve:end */
+        });
+        socket.on('TRAFFIC', function (data) {
+            if (Object.keys(data).length > 0) {
+                document.getElementById('card-traffic').classList.remove('d-none');
+            }
+
+            if (data.rxRate !== undefined && data.txRate !== undefined) {
+                document.getElementById('rx-rate').innerHTML = bytesToSize(data.rxRate, 'bps');
+                document.getElementById('tx-rate').innerHTML = bytesToSize(data.txRate, 'bps');
+                txRateArr.push(Math.ceil(parseInt(data.txRate)));
+                rxRateArr.push(Math.ceil(parseInt(data.rxRate)));
+                trafficChart.updateSeries([{
+                    name: 'Upload',
+                    data: txRateArr.slice(-100)
+                }, {
+                    name: 'Download',
+                    data: rxRateArr.slice(-100)
+                }]);
+            }
+
+        });
+
+        /* beautify preserve:start */
+        <% if(locals.device.wireless){ %>
+            socket.emit('REGISTRATION_TABLE', {
+                connectTo: '<%= device.connectTo %>',
+                os: '<%= device.os %>',
+                community: '<%= device.snmpCommunity %>',
+            })
+        <% } %>
+        /* beautify preserve:end */
+        socket.on('REGISTRATION_TABLE', function (data) {
+            if (Object.keys(data).length > 0) {
+                document.getElementById('card-registration-table').classList.remove('d-none');
+            }
+            if (data.noiseFloor !== undefined) {
+                document.getElementById('noise-floor').innerHTML = data.noiseFloor[0];
+            }
+            if (data.overallCcq !== undefined) {
+                document.getElementById('overall-ccq').innerHTML = data.overallCcq[0];
+            }
+            if (data.signalStrength !== undefined) {
+                let row = '';
+                for (var i = 0; i < data.signalStrength.length; i++) {
+                    row += '<tr>';
+                    if (data.radioName[i] !== undefined) {
+                        row += `<td>${data.radioName[i]}</td>`;
+                    } else {
+                        row += `<td></td>`;
+                    }
+                    if (data.signalStrength[i] !== undefined) {
+                        row += `<td>${data.signalStrength[i]}</td>`;
+                    } else {
+                        row += `<td></td>`;
+                    }
+                    if (data.uptime[i] !== undefined) {
+                        row += `<td>${formatDuration(parseInt(data.uptime[i]) / 1000)}</td>`;
+                    } else {
+                        row += `<td></td>`;
+                    }
+                    if (data.txRate[i] !== undefined) {
+                        row += `<td>${bytesToSize(data.txRate[i])} / ${bytesToSize(data.rxRate[i])}</td>`;
+                    } else {
+                        row += `<td></td>`;
+                    }
+                    row += `<td></td>`;
+                    row += '</tr>';
+                }
+                document.querySelector('#table-registration-table tbody').innerHTML = row;
+            }
+        });
+    </script>
+</body>
+
+</html>

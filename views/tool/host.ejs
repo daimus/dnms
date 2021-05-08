@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server - DNMS</title>
+    <!-- HEAD -->
+    <%- include('../partials/head') %>
+</head>
+
+<body class="antialiased">
+    <div class="page">
+        <!-- HEADER  -->
+        <%- include('../partials/header') %>
+
+        <div class="content">
+            <div class="container-xl">
+                <!-- PAGE HEADER  -->
+                <div class="page-header d-print-none">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <!-- Page pre-title -->
+                            <div class="page-pretitle">Manage</div>
+                            <div class="page-pretitle">
+                                <h2 class="page-title">Server</h2>
+                            </div>
+                        </div>
+                        <!-- Page title actions -->
+                        <div class="col-auto ms-auto d-print-none">
+                            <div class="btn-list">
+                                <span class="d-none d-sm-inline">
+                                    <a href="" class="btn btn-white"> Refresh Host </a>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- CONTENT  -->
+                <div class="row row-deck row-cards">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-vcenter card-table" id="table-host">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Address</th>
+                                            <th>MAC Address</th>
+                                            <th>Server</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td></td>
+                                            <td class="text-muted"></td>
+                                            <td class="text-muted"></td>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- FOOTER  -->
+            <%- include('../partials/footer') %>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT  -->
+    <%- include('../partials/javascript') %>
+    <script>
+        var hosts = [
+            /* beautify preserve:start */
+            <% if (locals.result && locals.result.status === 'success') { %>
+                <% locals.result.data.forEach(function (host) { %>
+                    {
+                        comment   : '<%= host['comment'] %>',
+                        address   : '<%= host['address'] %>',
+                        macAddress: '<%= host['mac-address'] %>',
+                        server    : '<%= host['server'] %>',
+                    },
+                <% }) %>
+            <% } %>
+            /* beautify preserve:end */
+        ];
+        docReady(function () {
+            showHost()
+        });
+
+        function showHost(event) {
+            if (event !== undefined) {
+                event.preventDefault();
+            }
+            document.querySelector('#table-host tbody').innerHTML = '';
+
+            function renderTable(hosts = Array()) {
+                if (hosts.length <= 0) {
+                    hostRow = document.createElement('tr');
+                    hostRow.innerHTML = `<tr><td colspan="4"><div class="empty"><div class="empty-img"><img src="/assets/vendor/tabler/static/illustrations/undraw_quitting_time_dm8t.svg" height="128" alt=""></div><p class="empty-title">No results found</p><p class="empty-subtitle text-muted"> Try adjusting your search or filter to find what you're looking for.</p></div></td></tr>`;
+                    document.querySelector('#table-host tbody').append(hostRow);
+                } else {
+                    hosts.map(function (host) {
+                        hostRow = document.createElement('tr');
+                        hostRow.innerHTML = /*html*/ `
+                            <td>${host['comment']}</td>
+                            <td>${host['address']}</td>
+                            <td>${host['macAddress']}</td>
+                            <td>${host['server']}</td>`;
+                        document.querySelector('#table-host tbody').append(hostRow);
+                    })
+                }
+            }
+
+            renderTable(hosts);
+        }
+    </script>
+</body>
+
+</html>

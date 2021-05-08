@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Subnetwork - DNMS</title>
+  <!-- HEAD -->
+  <%- include('../partials/head') %>
+</head>
+
+<body class="antialiased">
+  <div class="page">
+    <!-- HEADER  -->
+    <%- include('../partials/header') %>
+
+    <div class="content">
+      <div class="container-xl">
+        <!-- PAGE HEADER  -->
+        <div class="page-header d-print-none">
+          <div class="row align-items-center">
+            <div class="col">
+              <!-- Page pre-title -->
+              <div class="page-pretitle">Manage</div>
+              <div class="page-pretitle">
+                <h2 class="page-title">Subnetwork</h2>
+              </div>
+            </div>
+            <!-- Page title actions -->
+            <div class="col-auto ms-auto d-print-none">
+              <div class="btn-list">
+                <a href="#" class="btn btn-primary d-sm-inline-block" onclick="create()">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  <span class="">Add Subnetwork</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- CONTENT  -->
+        <!-- Item Length Selector & Search Form  -->
+        <div class="d-flex justify-content-between">
+          <div class="align-items-start">
+            <div class="mb-3">
+              <select class="form-select" id="size" onchange="load()">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+          </div>
+          <div class="align-items-end">
+            <div class="input-icon mb-3">
+              <input type="text" class="form-control" placeholder="Search…" onchange="load()" id="keyword" autocomplete="off" />
+              <span class="input-icon-addon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <circle cx="10" cy="10" r="7" />
+                  <line x1="21" y1="21" x2="15" y2="15" />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- Table  -->
+        <div class="row row-deck row-cards">
+          <div class="col-12">
+            <div class="card">
+              <table class="table table-vcenter table-mobile-md card-table" id="table-subnetwork">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Member</th>
+                    <th class="w-2"></th>
+                    <th class="w-2"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- tbody  -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- Data Count Info & Pagination  -->
+        <div class="d-flex justify-content-between mt-3">
+          <div class="align-items-start">
+            <p id="shown-items-info"></p>
+          </div>
+          <div class="align-items-end">
+            <ul class="pagination" id="pagination">
+
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- FOOTER  -->
+      <%- include('../partials/footer') %>
+    </div>
+  </div>
+  <!-- Modal form subnetwork  -->
+  <div class="modal modal-blur fade" id="modal-form-subnetwork" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <form onsubmit="save(event)" id="form-subnetwork" enctype="application/x-www-form-urlencoded">
+          <div class="modal-header">
+            <h5 class="modal-title"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <!-- subnetwork Info Section  -->
+          <div class="modal-body">
+            <input type="hidden" name="id" id="id" />
+            <div class="mb-3">
+              <label class="form-label">Name</label>
+              <input type="text" class="form-control" name="name" id="name" placeholder="Subnetwork name" required autocomplete="off" />
+            </div>
+            <div class="mb-3">
+              <div class="row g-2">
+                <div class="col">
+                  <input type="text" class="form-control" placeholder="Search for…" id="device-keyword">
+                </div>
+                <div class="col-auto">
+                  <button type="button" class="btn btn-primary btn-icon" aria-label="Button" onclick="renderDevices(document.getElementById('device-keyword').value)">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <circle cx="10" cy="10" r="7" />
+                      <line x1="21" y1="21" x2="15" y2="15" /></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3 row" id="device-list">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">Cancel</a>
+            <button class="btn btn-primary ms-auto" type="submit">
+              <span class="spinner-border spinner-border-sm me-2 state-loading d-none" role="status"></span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-device-floppy state-normal" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FFFFFF" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" />
+                <circle cx="12" cy="14" r="2" />
+                <polyline points="14 4 14 8 8 8 8 4" />
+              </svg>
+              Save change
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Modal confirmation delete subnetwork  -->
+  <div class="modal modal-blur" id="modal-delete-subnetwork" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable" role="document">
+      <div class="modal-content">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-status bg-danger"></div>
+        <div class="modal-body text-center py-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M12 9v2m0 4v.01" />
+            <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" />
+          </svg>
+          <h3>Are you sure?</h3>
+          <div class="text-muted">
+            Do you really want to remove
+            <span class="subnetwork-name font-weight-bold"></span>? What you've done
+            cannot be undone.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="w-100">
+            <div class="row">
+              <div class="col">
+                <a href="#" class="btn btn-white w-100" data-bs-dismiss="modal">Cancel</a>
+              </div>
+              <div class="col">
+                <a href="javascript:void(0)" id="button-confirm-delete" class="btn btn-danger w-100" onclick="destroy(null, true)">
+                  <span class="spinner-border spinner-border-sm me-2 state-loading d-none" role="status"></span> Delete
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT  -->
+  <%- include('../partials/javascript') %>
+  <script>
+    var modalFormDevice = new bootstrap.Modal(
+      document.getElementById('modal-form-subnetwork')
+    );
+    var modalDeleteDevice = new bootstrap.Modal(
+      document.getElementById('modal-delete-subnetwork')
+    );
+    docReady(function () {
+      loadDevices();
+      load();
+    });
+
+    function serverChanged() {
+      loadDevices();
+      load();
+    }
+
+    async function loadDevices() {
+      try {
+        const response = await axios.get(`/api/device`);
+        if (response.data.status === 'success') {
+          devices = response.data.data;
+          let deviceList = '';
+          devices.rows.forEach(function (device) {
+
+            /* beautify preserve:start */
+        deviceList += `<div class="col-6 mb-2 device-list" data-id="${device.id}" data-name="${device.name}"><label class="form-selectgroup-item flex-fill"><input type="checkbox" name="device-id[]" class="form-selectgroup-input" value="${device.id}">
+            <div class="form-selectgroup-label d-flex align-items-center p-3">
+              <div class="me-3"><span class="form-selectgroup-check"></span></div>
+              <div class="form-selectgroup-label-content d-flex align-items-center">
+                <div>
+                  <div class="font-weight-medium">${device.name}</div>
+                  <div class="text-muted">${device.comment} - ${device.connectTo}</div>
+                </div>
+              </div>
+            </div>
+          </label></div>`;
+        /* beautify preserve:end */
+          });
+          document.getElementById('device-list').innerHTML = deviceList;
+        }
+      } catch (error) {
+
+      }
+
+    }
+
+    function renderDevices(keyword = '', selectedDevices = []) {
+      var devices = document.querySelectorAll('.device-list');
+      devices.forEach(function (element) {
+        if (element.getAttribute('data-name').toLowerCase().includes(keyword.toLowerCase())) {
+          element.classList.remove('d-none');
+          if (selectedDevices.indexOf(element.getAttribute('data-id')) >= 0) {
+            element.querySelector('input').checked = true;
+          }
+        } else {
+          element.classList.add('d-none');
+        }
+      });
+    }
+
+    function selectDevice(checkbox) {
+      if (checkbox.checked) {
+        selectedDevices.push(parseInt(checkbox.value));
+      } else {
+        selectedDevices.splice(selectedDevices.indexOf(parseInt(checkbox.value)), 1);
+      }
+    }
+
+    function load(page = 1) {
+      // Reset Table
+      document.querySelector('#table-subnetwork tbody').innerHTML = '';
+      // Set table loading
+      /* beautify preserve:start */
+      document.querySelector('#table-subnetwork tbody').innerHTML = `<tr><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td></tr>`;
+      /* beautify preserve:end */
+
+      // Do request
+      let size = document.getElementById('size').value;
+      let keyword = document.getElementById('keyword').value;
+      axios.get(`/api/subnetwork?page=${page}&size=${size}&keyword=${keyword}`).then(function (response) {
+          // Is success: render data
+          if (response.data.status === 'success') {
+            let tbody = '';
+            if (response.data.data.rows.length <= 0) {
+              /* beautify preserve:start */
+              tbody = `<tr><td colspan="4"><div class="empty"><div class="empty-img"><img src="/assets/vendor/tabler/static/illustrations/undraw_quitting_time_dm8t.svg" height="128" alt=""></div><p class="empty-title">No results found</p><p class="empty-subtitle text-muted"> Try adjusting your search or filter to find what you're looking for.</p></div></td></tr>`;
+              /* beautify preserve:end */
+              document.getElementById('pagination').innerHTML = '';
+              document.getElementById('shown-items-info').innerHTML = '';
+            } else {
+              // PAGINATION 
+              let firstIndexRow = (page - 1) * parseInt(size);
+              document.getElementById('shown-items-info').innerHTML = response.data.data.rows.length > 0 ? `${firstIndexRow + 1} - ${firstIndexRow + response.data.data.rows.length} of ${response.data.data.count} Items` : `0 Item`;
+
+              let totalPage = Math.ceil(response.data.data.count / size);
+              /* beautify preserve:start */
+              let prevButton = `<li class="page-item"> <a class="page-link" href="javascript:void(0)" ${page < totalPage ? "onclick='load(" +(page - 1)+")'" : 'disabled' } tabindex="-1"> <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><polyline points="15 6 9 12 15 18" /> </svg> prev </a></li>`;
+              /* beautify preserve:start */
+              /* beautify preserve:end */
+              let nextButton = `<li class="page-item"> <a class="page-link" href="javascript:void(0)" ${page < totalPage ? "onclick='load("+(page + 1)+")'" : 'disabled' }> next <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <polyline points="9 6 15 12 9 18" /> </svg> </a></li>`;
+              /* beautify preserve:end */
+              let pagination = prevButton;
+              for (let i = 1; i <= totalPage; i++) {
+                pagination += `<li class="page-item ${i == page ? 'active' : ''}"><a class="page-link" href="javascript:void(0)" onclick='load(${i})'>${i}</a></li>`;
+              }
+              pagination += nextButton;
+              document.getElementById('pagination').innerHTML = pagination;
+              response.data.data.rows.forEach(function (subnetwork) {
+                // Render table
+                /* beautify preserve:start */
+                tbody += `<tr><td data-label="Name"><div class="d-flex py-1 align-items-center"><div class="flex-fill"><div class="font-weight-medium">${subnetwork.name}</div></div></div></td><td data-label="Member"><div>`;
+                subnetwork.member.forEach(function(device){
+                  tbody += `<span class="badge bg-secondary mx-1">${device.name}</span>`;
+                });
+                tbody += `</div>
+                </td>
+                <td data-label="Status">
+                  <div class="text-muted">${subnetwork.enabled ? '<span class="badge bg-green">enabled</span> ' : ' <span class="badge bg-red"> disabled </span>'} </div>
+                </td>
+                <td>
+                  <div class="btn-list flex-nowrap"> <a href="javascript:void(0)" class="btn btn-white" onclick='edit(${JSON.stringify(subnetwork)})'> Edit </a>
+                    <div class="dropdown"><button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown"> Actions</button>
+                      <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="javascript:void(0)" onclick='enable(${subnetwork.id}, ${!subnetwork.enabled})'> ${subnetwork.enabled ? 'Disable' : 'Enable'}</a><a class="dropdown-item" href="javascript:void(0)" onclick='destroy(${JSON.stringify({id: subnetwork.id, name: subnetwork.name})})'>Delete</a> </div>
+                    </div>
+                  </div>
+                </td>
+                </tr>`;
+                    /* beautify preserve:end */
+              });
+            }
+            document.querySelector('#table-subnetwork tbody').innerHTML = tbody;
+          }
+          // Is error: show error
+        })
+        .catch(function (error) {
+          // Unset table loading
+          // Show error
+          console.log('Error: ', error);
+        });
+    }
+
+    function create() {
+      document.getElementById('id').value = '';
+      document.querySelector('#modal-form-subnetwork .modal-title').innerHTML = 'Add new subnetwork';
+      document.getElementById('form-subnetwork').reset();
+      renderDevices();
+      modalFormDevice.show();
+    }
+
+    function edit(subnetwork) {
+      document.querySelector('#modal-form-subnetwork .modal-title').innerHTML = 'Edit subnetwork';
+      // Unset loading state form
+      setFormLoadingState(false);
+      // Apply selected data to form
+      document.getElementById('id').value = subnetwork.id;
+      document.getElementById('name').value = subnetwork.name;
+      renderDevices('', JSON.parse(subnetwork.deviceId));
+      modalFormDevice.show();
+    }
+
+    function save(event) {
+      event.preventDefault();
+      // Set button loading
+      setFormLoadingState(true);
+      // Do request
+      var subnetwork = serializeFormData(document.getElementById('form-subnetwork'), {
+        enabled: true,
+        fromCase: 'kebab',
+        toCase: 'camel'
+      });
+      var url = subnetwork.id ? `/api/subnetwork/${subnetwork.id}?_method=PATCH` : `/api/subnetwork/create`;
+      axios.post(url, subnetwork).then(function (response) {
+          // Unset button loading
+          setFormLoadingState(false);
+          // If success: hide modal; call load func
+          if (response.data.status === 'success') {
+            modalFormDevice.hide();
+            load();
+          }
+          // If !success: trigger alert
+        })
+        .catch(function (error) {
+          // Unset button loading
+          setFormLoadingState(false);
+          // Trigger alert
+          console.log('Error: ', error);
+        });
+    }
+
+    function destroy(subnetwork, deleteImmediately = false) {
+      function setConfirmationButtonLoadingState(isLoading = false) {
+        if (isLoading) {
+          document.querySelector('#modal-delete-subnetwork .state-loading').classList.remove('d-none');
+        } else {
+          document.querySelector('#modal-delete-subnetwork .state-loading').classList.add('d-none');
+        }
+      }
+      setConfirmationButtonLoadingState(false);
+      document.querySelector('#modal-delete-subnetwork .subnetwork-name').innerHTML = subnetwork.name;
+      // Trigger confirmation modal
+      modalDeleteDevice.show();
+      document.getElementById('button-confirm-delete').setAttribute('onclick', `destroy(${JSON.stringify(subnetwork)}, true)`);
+      if (deleteImmediately) {
+        // Set loading
+        setConfirmationButtonLoadingState(true);
+        // Do request
+        axios.post(`/api/subnetwork/${subnetwork.id}?_method=DELETE`).then(function (response) {
+          // Unset loading
+          setConfirmationButtonLoadingState(false);
+          if (response.data.status === 'success') {
+            // If success: hide modal, load
+            modalDeleteDevice.hide();
+            load();
+            loadAll();
+          }
+        }).catch(function (error) {
+          // Unset loading
+          setConfirmationButtonLoadingState(false);
+        });
+      }
+    }
+
+    function enable(subnetworkId, enabled) {
+      // Do request
+      axios.post(`/api/subnetwork/${subnetworkId}?_method=PATCH`, {
+        enabled: enabled
+      }).then(function (response) {
+        if (response.data.status === 'success') {
+          load();
+        }
+      }).catch(function (error) {
+
+      });
+    }
+
+    function setFormLoadingState(isLoading = true) {
+      if (isLoading) {
+        document.querySelector('#form-subnetwork .state-loading').classList.remove('d-none');
+        document.querySelector('#form-subnetwork .state-normal').classList.add('d-none');
+      } else {
+        document.querySelector('#form-subnetwork .state-normal').classList.remove('d-none');
+        document.querySelector('#form-subnetwork .state-loading').classList.add('d-none');
+      }
+    }
+  </script>
+</body>
+
+</html>

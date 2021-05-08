@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Server - DNMS</title>
+	<!-- HEAD -->
+	<%- include('../partials/head') %>
+</head>
+
+<body class="antialiased">
+	<div class="page">
+		<!-- HEADER  -->
+		<%- include('../partials/header') %>
+
+		<div class="content">
+			<div class="container-xl">
+				<!-- PAGE HEADER  -->
+				<div class="page-header d-print-none">
+					<div class="row align-items-center">
+						<div class="col">
+							<!-- Page pre-title -->
+							<div class="page-pretitle">Usage Statistic</div>
+							<div class="page-pretitle">
+								<h2 class="page-title">
+									<% if (locals.server){ %> 
+										<%= server.name %> - <%= server.comment %> 
+									<% } %>
+								</h2>
+							</div>
+						</div>
+						<!-- Page title actions -->
+
+					</div>
+				</div>
+				<!-- CONTENT  -->
+				<div class="row row-deck row-cards">
+					<div class="col-12">
+						<div class="card">
+							<div class="card-body">
+								<div id="chart-usage-statistic"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- FOOTER  -->
+			<!-- prettier-ignore -->
+			<%- include('../partials/footer') %>
+		</div>
+	</div>
+
+	<!-- JAVASCRIPT  -->
+	<%- include('../partials/javascript') %>
+	<script src="/assets/vendor/tabler/libs/apexcharts/dist/apexcharts.min.js"></script>
+	<script>
+		/* beautify preserve:start */
+		<% if (locals.usageStat) { %>
+			<% if (locals.usageStat.length > 0) { %>
+				document.addEventListener("DOMContentLoaded", function () {
+				window.ApexCharts && (new ApexCharts(document.getElementById('chart-usage-statistic'), {
+					chart: {
+						type: "bar",
+						fontFamily: 'inherit',
+						height: 2000,
+						parentHeightOffset: 0,
+						toolbar: {
+							show: false,
+						},
+						animations: {
+							enabled: false
+						},
+					},
+					plotOptions: {
+						bar: {
+							barHeight: '80%',
+							horizontal: true
+						}
+					},
+					dataLabels: {
+						enabled: false,
+					},
+					fill: {
+						opacity: 1,
+					},
+					series: [{
+						name: "Usage Statistic",
+						data: [
+							<% locals.usageStat.forEach(function (queue) { %>
+								parseFloat(<%= queue.totalBytes / 1000000000 %>.toFixed(3)),
+							<% }) %>
+						]
+					}],
+					grid: {
+						padding: {
+							top: -20,
+							right: 0,
+							left: -4,
+							bottom: -4
+						},
+						strokeDashArray: 4,
+					},
+					xaxis: {
+						labels: {
+							padding: 0
+						},
+						tooltip: {
+							enabled: false
+						},
+						axisBorder: {
+							show: false,
+						},
+						style: {
+							colors: [],
+							fontSize: '120px',
+							fontFamily: 'Helvetica, Arial, sans-serif',
+							fontWeight: 400
+						},
+					},
+					yaxis: {
+						labels: {
+							padding: 4
+						},
+					},
+					labels: [
+						<% locals.usageStat.forEach(function (queue) { %>
+							'<%= queue.name %>',
+						<% }) %>
+					],
+					colors: ["#206bc4"],
+					legend: {
+						show: false,
+					},
+				})).render();
+			});
+			<% } else { %>
+				document.getElementById('chart-usage-statistic').innerHTML = `<div class="text-center py-4"><svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v2m0 4v.01" /><path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" /></svg><h3>Server Unreachable!</h3><div class="text-muted">Somehow app cannot reach server. Please check configuration and make sure server is online.</div></div>`;
+			<% } %>
+		<% } %>
+		/* beautify preserve:end */
+	</script>
+</body>
+
+</html>

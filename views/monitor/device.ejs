@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server - DNMS</title>
+    <!-- HEAD -->
+    <%- include('../partials/head') %>
+    <style>
+        .btn-status {
+            display: block;
+            width: 250px;
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+    <div class="page">
+        <!-- HEADER  -->
+        <%- include('../partials/header') %>
+
+        <div class="content">
+            <div class="container-xl">
+                <!-- PAGE HEADER  -->
+                <div class="page-header d-print-none">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <!-- Page pre-title -->
+                            <div class="page-pretitle">Monitor</div>
+                            <div class="page-pretitle">
+                                <h2 class="page-title">Device</h2>
+                            </div>
+                        </div>
+                        <!-- Page title actions -->
+                    </div>
+                </div>
+                <!-- CONTENT  -->
+                <div class="row row-deck row-cards">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div>
+                                    <select name="subnetwork" id="subnetwork" class="form-control"
+                                        onchange="changeNetwork(this.value)">
+                                        <option value="0">Whole Network</option>
+                                        <% if (locals.subnetworks){ %>
+                                        <% locals.subnetworks.map(subnetwork => { %>
+                                        <option value="<%= subnetwork.id %>"><%= subnetwork.name %> </option>
+                                        <% }) %>
+                                        <% } %>
+                                    </select>
+                                </div>
+                                <div class="row row-deck row-cards mt-4">
+                                    <% if(locals.devices){ %>
+                                    <% locals.devices.forEach((device) => { %>
+                                    <div class="col-lg-3 col-md-4 col-sm-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="row g-2 align-items-center">
+                                                    <div class="col">
+                                                        <h4 class="card-title m-0">
+                                                            <a
+                                                                href="/monitor/device/<%= device.id %>"><%= device.name %></a>
+                                                        </h4>
+                                                        <div class="text-muted"><%= device.comment %></div>
+                                                        <div class="small mt-1" id="ping-<%= device.id %>">
+                                                            <span class="badge bg-red"></span> Unknown
+                                                        </div>
+                                                        <div class="mt-2">
+                                                            <div id="traffic-<%= device.id %>"></div>
+                                                            <div id="wireless-<%= device.id %>"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <% }) %>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- FOOTER  -->
+            <%- include('../partials/footer') %>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT  -->
+    <%- include('../partials/javascript') %>
+    <script>
+        docReady(function () {
+            var selectedSubnetwork = findGetParameter('subnetwork');
+            if (selectedSubnetwork !== null) {
+                document.getElementById('subnetwork').value = selectedSubnetwork;
+            }
+        });
+
+        function changeNetwork(subnetworkId) {
+            if (subnetworkId > 0) {
+                window.location.href = "?subnetwork=" + subnetworkId;
+            }
+        }
+
+        function serverChanged() {
+            window.location.href = "/monitor/device";
+        }
+        socket.emit('MONITOR_DEVICE', {
+            devices: [
+                /* beautify preserve:start */
+                <% if (locals.devices) { %>
+                    <% devices.map(device => { %>
+                        {
+                            id       : <%= device.id %>,
+                            host     : '<%= device.connectTo %>',
+                            os       : '<%= device.os %>',
+                            community: '<%= device.snmpCommunity %>',
+                            wireless : <%= device.wireless %>,
+                        },
+                    <% }) %>
+                <% } %>
+                /* beautify preserve:end */
+            ]
+        });
+        socket.on('MONITOR_DEVICE', function (data) {
+            if (data.isAlive) {
+                pingStatus = `<span class="badge bg-green"></span> Online (${data.avg} ms)`;
+            } else {
+                pingStatus = `<span class="badge bg-red"></span> ${data.status}`;
+            }
+            document.getElementById(`ping-${data.id}`).innerHTML = pingStatus;
+
+            if (data.txRate !== undefined && data.rxRate !== undefined) {
+                /* beautify preserve:start */
+                document.getElementById(`traffic-${data.id}`).innerHTML = `<div class="mb-2"> <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-up-circle" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="8" y2="12" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="16" y1="12" x2="12" y2="8" /> </svg> <strong>${data.rxRate}</strong> <span class="mx-2"></span> <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-down-circle" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><circle cx="12" cy="12" r="9" /><line x1="8" y1="12" x2="12" y2="16" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="16" y1="12" x2="12" y2="16" /> </svg> <strong>${data.txRate}</strong> </div>`;
+                /* beautify preserve:end */
+            }
+            if (data.mode !== undefined && data.wireless) {
+                /* beautify preserve:start */
+                if (data.mode.includes('ap')){
+                    label = `Connected Client: ${data.signalStrength.length}`;
+                } else {
+                    label = `Signal Strength: ${data.signalStrength[0]}`;
+                }
+                wirelessStatus = `<div class="mb-2"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-wifi" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="18" x2="12.01" y2="18"/><path d="M9.172 15.172a4 4 0 0 1 5.656 0"/><path d="M6.343 12.343a8 8 0 0 1 11.314 0"/><path d="M3.515 9.515c4.686 -4.687 12.284 -4.687 17 0"/></svg> <strong class="mr-4">${label}</strong></div>`;
+                /* beautify preserve:end */
+                document.getElementById(`wireless-${data.id}`).innerHTML = wirelessStatus;
+            }
+        });
+    </script>
+</body>
+
+</html>

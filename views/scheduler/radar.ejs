@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline Radar Configuration - DNMS</title>
+    <!-- HEAD -->
+    <%- include('../partials/head') %>
+</head>
+
+<body class="antialiased">
+    <div class="page">
+        <!-- HEADER  -->
+        <%- include('../partials/header') %>
+
+        <div class="content">
+            <div class="container-xl">
+                <!-- PAGE HEADER  -->
+                <div class="page-header d-print-none">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <!-- Page pre-title -->
+                            <div class="page-pretitle">Tool</div>
+                            <div class="page-pretitle">
+                                <h2 class="page-title">Offline Check Configuration</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- CONTENT  -->
+                <div class="row row-deck row-cards">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="alert alert-info" role="alert">
+                                Create scheduler/cron job to execute this link
+                                <code>https://your_domain_or_ip/scheduler/radar/run</code>
+                            </div>
+                            <form action="/scheduler/radar/configure?_method=PATCH" method="post">
+                                <div class="mb-3">
+                                    <label class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="radar-telegram-report" <% if (locals.radarTelegramReport){ %><% if (locals.radarTelegramReport.value === '1'){ %><%= 'checked' %><% } %><% } %> >
+                                        <span class="form-check-label">Send report to telegram</span>
+                                    </label>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Exclude Device</label>
+                                    <div class="row g-2">
+                                        <div class="col">
+                                            <input type="text" class="form-control" placeholder="Search for…"
+                                                id="device-keyword">
+                                        </div>
+                                        <div class="col-auto">
+                                            <button type="button" class="btn btn-primary btn-icon" aria-label="Button"
+                                                onclick="filterDevice(document.getElementById('device-keyword').value)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
+                                                    height="24" viewBox="0 0 24 24" stroke-width="2"
+                                                    stroke="currentColor" fill="none" stroke-linecap="round"
+                                                    stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <circle cx="10" cy="10" r="7" />
+                                                    <line x1="21" y1="21" x2="15" y2="15" /></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <% if (locals.devices){ %>
+                                    <% locals.devices.forEach(device => { %>
+                                    <div class="col-6 mb-2 device-list" data-name="<%= device.name %>">
+                                        <label class="form-selectgroup-item flex-fill">
+                                            <input type="checkbox" name="invisible[]" class="form-selectgroup-input"
+                                                value="<%= device.id %>" <%= device.visible ? '' : 'checked' %>>
+                                            <div class="form-selectgroup-label d-flex align-items-center p-3">
+                                                <div class="me-3">
+                                                    <span class="form-selectgroup-check"></span></div>
+                                                <div class="form-selectgroup-label-content d-flex align-items-center">
+                                                    <div>
+                                                        <div class="font-weight-medium"><%= device.name %></div>
+                                                        <div class="text-muted"><%= device.comment %> -
+                                                            <%= device.connectTo %>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <% }) %>
+                                    <% } %>
+                                </div>
+                                <div>
+                                    <button class="btn btn-primary ms-auto" type="submit">
+                                        <span class="spinner-border spinner-border-sm me-2 state-loading d-none"
+                                            role="status"></span>
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            class="icon icon-tabler icon-tabler-device-floppy state-normal" width="44"
+                                            height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FFFFFF"
+                                            fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path
+                                                d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" />
+                                            <circle cx="12" cy="14" r="2" />
+                                            <polyline points="14 4 14 8 8 8 8 4" />
+                                        </svg>
+                                        Save change
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- FOOTER  -->
+            <%- include('../partials/footer') %>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT  -->
+    <%- include('../partials/javascript') %>
+    <script>
+        docReady(function () {});
+
+        function filterDevice(keyword = '') {
+            var devices = document.querySelectorAll('.device-list');
+            devices.forEach(function (element) {
+                if (element.getAttribute('data-name').toLowerCase().includes(keyword.toLowerCase())) {
+                    element.classList.remove('d-none');
+                    if (selectedDevices.indexOf(element.getAttribute('data-id')) >= 0) {
+                        element.querySelector('input').checked = true;
+                    }
+                } else {
+                    element.classList.add('d-none');
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

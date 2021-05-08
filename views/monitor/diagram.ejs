@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Server - DNMS</title>
+	<!-- HEAD -->
+	<%- include('../partials/head') %>
+	<script src="/assets/vendor/d3/d3.v5.min.js" charset="utf-8"></script>
+	<script src="/assets/vendor/d3/dagre-d3.js"></script>
+
+	<style>
+		@-webkit-keyframes flash {
+
+			0%,
+			50%,
+			100% {
+				opacity: 1;
+			}
+
+			25%,
+			75% {
+				opacity: 0.2;
+			}
+		}
+
+		@keyframes flash {
+
+			0%,
+			50%,
+			100% {
+				opacity: 1;
+			}
+
+			25%,
+			75% {
+				opacity: 0.2;
+			}
+		}
+
+		.warn {
+			-webkit-animation-duration: 5s;
+			animation-duration: 5s;
+			-webkit-animation-fill-mode: both;
+			animation-fill-mode: both;
+			-webkit-animation-iteration-count: 1;
+			animation-iteration-count: 1;
+		}
+
+		.live.map {
+			width: 100%;
+			height: 500px;
+		}
+
+		svg {
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+		}
+
+		.live.map text {
+			font-weight: 300;
+			font-size: 14px;
+		}
+
+		.live.map .node rect {
+			stroke-width: 1.5px;
+			stroke: #bbb;
+			fill: #666;
+		}
+
+		.live.map .status {
+			height: 100%;
+			width: 15px;
+			display: block;
+			float: left;
+			border-top-left-radius: 5px;
+			border-bottom-left-radius: 5px;
+			margin-right: 4px;
+		}
+
+		.live.map .running .status {
+			background-color: #7f7;
+		}
+
+		.live.map .running.warn .status {
+			background-color: #ffed68;
+		}
+
+		.live.map .stopped .status {
+			background-color: #f77;
+		}
+
+		.live.map .warn .queue {
+			color: #f77;
+		}
+
+		.warn {
+			-webkit-animation-name: flash;
+			animation-name: flash;
+		}
+
+		.live.map .consumers {
+			margin-right: 2px;
+		}
+
+		.live.map .consumers,
+		.live.map .name {
+			margin-top: 4px;
+		}
+
+		.live.map .queue {
+			display: block;
+			float: left;
+			width: 130px;
+			height: 20px;
+			font-size: 12px;
+			margin-top: 2px;
+		}
+
+		.live.map .node g div {
+			width: 250px;
+			height: 80px;
+			color: #fff;
+		}
+
+		.live.map .node g div span.consumers {
+			display: inline-block;
+			width: 20px;
+		}
+
+		.live.map .edgeLabel text {
+			width: 50px;
+			fill: #000;
+		}
+
+		.live.map .edgePath path {
+			stroke: #999;
+			stroke-width: 1.5px;
+			fill: #999;
+		}
+	</style>
+</head>
+
+<body class="antialiased">
+	<div class="page">
+		<!-- HEADER  -->
+		<%- include('../partials/header') %>
+
+		<div class="content">
+			<div class="container-xl">
+				<!-- PAGE HEADER  -->
+				<div class="page-header d-print-none">
+					<div class="row align-items-center">
+						<div class="col">
+							<!-- Page pre-title -->
+							<div class="page-pretitle">Monitor</div>
+							<div class="page-pretitle">
+								<h2 class="page-title">Device</h2>
+							</div>
+						</div>
+						
+					</div>
+				</div>
+				<!-- CONTENT  -->
+				<div class="row row-deck row-cards">
+					<div class="col-12">
+
+					</div>
+					<div class="col-12">
+						<div class="card">
+							<form onsubmit="ping(event)" id="form-ping" class="m-4">
+								<div class="form-group mb-3 row">
+									<label class="form-label col-3 col-form-label">Sub Network</label>
+									<div class="col">
+										<select name="subnetwork" id="subnetwork" class="form-control" onchange="changeNetwork(this.value)">
+											<option value="0">Whole Network</option>
+											<% if (locals.subnetworks){ %>
+											<% locals.subnetworks.map(subnetwork => { %>
+											<option value="<%= subnetwork.id %>"><%= subnetwork.name %> </option>
+											<% }) %>
+											<% } %>
+										</select>
+									</div>
+								</div>
+							</form>
+							<div class="live map">
+								<svg>
+									<g />
+								</svg>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- FOOTER  -->
+			<%- include('../partials/footer') %>
+		</div>
+	</div>
+
+	<!-- JAVASCRIPT  -->
+	<%- include('../partials/javascript') %>
+	<script src="https://visjs.github.io/vis-network/standalone/umd/vis-network.min.js"></script>
+	<script>
+		docReady(function () {
+			var selectedSubnetwork = findGetParameter('subnetwork');
+			if (selectedSubnetwork !== null) {
+				document.getElementById('subnetwork').value = selectedSubnetwork;
+			}
+			draw();
+		});
+
+		function serverChanged() {
+			window.location.href = "/monitor/diagram";
+		}
+
+		var devices = {
+			/* beautify preserve:start */
+			<% if (locals.devices) { %>
+				0: {
+					id : 0,
+					name: 'SERVER',
+					isAlive: true,
+				},
+				<% locals.devices.map(function (device) { %>
+				<%= device.id %> : {
+					id            : <%= device.id %>,
+					name          : '<%= `${device.name} ${device.comment}` %>',
+					host          : '<%= device.connectTo %>',
+					connectedTo   : <%= device.connectedTo %>,
+					isAlive       : false,
+					latency       : 999,
+					status        : 'checking',
+					wireless      : <%= device.wireless %>,
+					mode          : 'unknown',
+					signalStrength: [],
+					radioName     : [],
+				},
+				<% }) %>
+			<% } %>
+			/* beautify preserve:end */
+		};
+
+		// Set up zoom support
+		var svg = d3.selectAll("svg"),
+			inner = svg.selectAll("g"),
+			zoom = d3.zoom().on("zoom", function () {
+				inner.attr("transform", d3.event.transform);
+			});
+		svg.call(zoom);
+
+		var render = new dagreD3.render();
+
+		var g = new dagreD3.graphlib.Graph();
+		g.setGraph({
+			nodesep: 70,
+			ranksep: 50,
+			rankdir: "UD",
+			marginx: 20,
+			marginy: 20
+		});
+
+		function draw(isUpdate) {
+			for (var id in devices) {
+				var device = devices[id];
+				var html = `<div>
+					<span class=status></span>
+					<span class=consumers>${device.name}</span>
+					<br>
+					${device.txRate !== undefined && device.rxRate !== undefined ? '<span class=queue><span class=counter>Up: '+device.rxRate+' Down: '+device.txRate+'</span></span>' : ''}
+					${device.wireless && device.mode !== 'unknown' ? device.mode.includes('ap') ? '<span class=queue><span class=counter>Connected Client: '+device.signalStrength.length+'</span></span>' : '<span class=queue><span class=counter>Signal Srength: '+device.signalStrength[0]+'</span></span>' : ''}
+					
+					</div>`;
+				g.setNode(id, {
+					labelType: "html",
+					label: html,
+					rx: 5,
+					ry: 5,
+					padding: 0,
+					class: device.isAlive ? 'running' : 'stopped',
+				});
+				if (device.connectedTo !== undefined) {
+					var connectedTo = devices[device.connectedTo] === undefined ? 0 : device.connectedTo;
+					g.setEdge(connectedTo, id, {
+						label: `${device.isAlive ? device.latency + ' ms' : device.status}`,
+						width: 40
+					});
+				}
+
+			}
+
+			inner.call(render, g);
+		}
+
+		function changeNetwork(subnetworkId) {
+			if (subnetworkId > 0) {
+				window.location.href = "?subnetwork=" + subnetworkId;
+			}
+		}
+	</script>
+	<script>
+		socket.emit('MONITOR_DEVICE', {
+			devices: [
+				/* beautify preserve:start */
+				<% if(locals.devices) { %>
+					<% devices.map(device => { %>
+					{
+						id       : <%= device.id %>,
+						host     : '<%= device.connectTo %>',
+						os       : '<%= device.os %>',
+						community: '<%= device.snmpCommunity %>',
+						wireless : <%= device.wireless %>,
+					},
+					<% }) %>
+				<% } %>
+				/* beautify preserve:end */
+			]
+		});
+		socket.on('MONITOR_DEVICE', function (data) {
+			if (data.isAlive) devices[data.id].isAlive = data.isAlive;
+			if (data.avg) devices[data.id].latency = data.avg;
+			if (data.status) devices[data.id].status = data.status;
+			if (data.radioName) devices[data.id].radioName = data.radioName;
+			if (data.signalStrength) devices[data.id].signalStrength = data.signalStrength;
+			if (data.mode) devices[data.id].mode = data.mode;
+			if (data.txRate) devices[data.id].txRate = data.txRate;
+			if (data.rxRate) devices[data.id].rxRate = data.rxRate;
+
+			draw(true);
+			// nodes.find(x => x.id === data.id).color = data.isAlive ? 'green' : 'red';
+
+		});
+	</script>
+</body>
+
+</html>

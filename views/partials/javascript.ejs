@@ -1,0 +1,38 @@
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="/assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+<script src="/assets/vendor/axios/axios.min.js"></script>
+<script src="/assets/vendor/sweetalert/sweetalert.min.js"></script>
+<script src="/assets/vendor/socket.io/socket.io.min.js"></script>
+<script src="/assets/js/utils.js"></script>
+<script src="/assets/js/app.js"></script>
+<script>
+    var socket = io();
+    socket.on('ALERT', function (data) {
+        if (data.status === 'success') {
+            swal({
+                icon: "success",
+                button: {
+                    text: "Okay",
+                },
+                title: data.title ? data.title : 'Success!',
+                text: data.message
+            });
+        } else {
+            swal({
+                icon: "error",
+                button: {
+                    text: "Close",
+                },
+                title: data.title ? data.title : 'Ouch!',
+                text: data.message
+            });
+        }
+    });
+    /* beautify preserve:start */
+    <% if (locals.alert){ %>
+        <% locals.alert.forEach(alert => { %>
+            swal('<%= alert.title %>', '<%= alert.message %>', '<%= alert.status %>');
+        <% }) %>
+    <% } %>
+    /* beautify preserve:end */
+</script>

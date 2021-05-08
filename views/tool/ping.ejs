@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server - DNMS</title>
+    <!-- HEAD -->
+    <%- include('../partials/head') %>
+</head>
+
+<body class="antialiased">
+    <div class="page">
+        <!-- HEADER  -->
+        <%- include('../partials/header') %>
+
+        <div class="content">
+            <div class="container-xl">
+                <!-- PAGE HEADER  -->
+                <div class="page-header d-print-none">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <!-- Page pre-title -->
+                            <div class="page-pretitle">Tool</div>
+                            <div class="page-pretitle">
+                                <h2 class="page-title">Ping</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- CONTENT  -->
+                <div class="row row-deck row-cards">
+                    <div class="card">
+                        <div class="card-body">
+                            <form onsubmit="ping(event)" id="form-ping">
+                                <div class="form-group mb-3 row">
+                                    <label class="form-label col-3 col-form-label">IP Address</label>
+                                    <div class="col">
+                                        <input type="text" class="form-control" placeholder="Enter IP or Domain"
+                                            name="host" required>
+                                    </div>
+                                </div>
+                                <div class="form-group mb-3 row">
+                                    <label class="form-label col-3 col-form-label">Count</label>
+                                    <div class="col">
+                                        <input type="number" class="form-control" name="count" value="4" required>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary">PING</button>
+                                </div>
+                            </form>
+                            <table id=table-ping class="table table-hover mt-3">
+                                <thead>
+                                    <tr>
+                                        <th>Seq</th>
+                                        <th>Host</th>
+                                        <th>Time</th>
+                                        <th>Size</th>
+                                        <th>TTL</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">Enter IP or domain, then click PING</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- FOOTER  -->
+            <%- include('../partials/footer') %>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT  -->
+    <%- include('../partials/javascript') %>
+    <script>
+        socket.on('PING', (data) => {
+            pingResult = document.createElement('tr');
+            pingResult.innerHTML = `
+                    <td>${data['seq']}</td>
+                    <td>${data['host']}</td>
+                    <td>${data['time'] !== undefined ? data['time'] : ''}</td>
+                    <td>${data['size'] !== undefined ? data['size'] : ''}</td>
+                    <td>${data['ttl'] !== undefined ? data['ttl'] : ''}</td>
+                    <td>${data['status'] !== undefined ? data['status'] : ''}</td>`;
+            document.querySelector('#table-ping tbody').append(pingResult);
+        });
+
+        function ping(event) {
+            event.preventDefault();
+            document.querySelector('#table-ping tbody').innerHTML = '';
+            const payload = serializeFormData(document.getElementById('form-ping'));
+            socket.emit('PING', payload);
+        }
+    </script>
+</body>
+
+</html>

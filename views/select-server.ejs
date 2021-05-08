@@ -1,0 +1,175 @@
+<!doctype html>
+<!--
+* Tabler - Premium and Open Source dashboard template with responsive and high quality UI.
+* @version 1.0.0-beta
+* @link https://tabler.io
+* Copyright 2018-2021 The Tabler Authors
+* Copyright 2018-2021 codecalm.net Paweł Kuna
+* Licensed under MIT (https://github.com/tabler/tabler/blob/master/LICENSE)
+-->
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Server Selector Wizard - DNMS</title>
+    <!-- CSS files -->
+    <%- include('partials/head') %>
+</head>
+
+<body class="antialiased border-top-wide border-primary d-flex flex-column">
+    <div class="flex-fill d-flex flex-column justify-content-center py-4">
+        <div class="container-tight py-6">
+            <div class="card card-md">
+                <% if (locals.action == 'SELECT' || locals.action == 'ENABLE') { %>
+                <div class="card-body text-center py-4 p-sm-5">
+                    <img src="/assets/vendor/tabler/static/illustrations/undraw_sign_in_e6hj.svg" height="128" class="mb-n2" height="120" alt="">
+                    <h1 class="mt-5">Welcome to DNMS!</h1>
+                </div>
+                <div class="hr-text hr-text-center hr-text-spaceless">app configuration</div>
+                <% } %>
+                <div class="card-body">
+                    <% if (locals.action == 'SELECT') { %>
+                    <div class="mb-3">
+                        <form id="form">
+                            <label class="form-label">Select Server</label>
+                            <div class="input-group input-group-flat">
+                                <select name="server-id" id="server" class="form-control">
+                                    <% locals.servers.map(server => { %>
+                                    <% if (server.enabled){ %>
+                                    <option value="<%= server.id %> "><%= server.name %></option>
+                                    <% } %>
+                                    <% }) %>
+                                </select>
+                            </div>
+                        </form>
+                        <div class="form-hint">Choose a server you want to manage.</div>
+                    </div>
+                    <% } %>
+                    <% if (locals.action == 'CREATE') { %>
+                    <form id="form">
+                        <input type="hidden" name="id" id="id" />
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-control" name="name" id="name" placeholder="Server name" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Comment</label>
+                            <textarea name="comment" id="comment" rows="2" class="form-control" placeholder="Server comment or note"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Connect To</label>
+                            <input type="text" class="form-control" name="connect-to" id="connect-to" placeholder="Server IP or domain" required />
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="mb-3">
+                                    <label class="form-label">API Port</label>
+                                    <input type="text" class="form-control" name="api-port" id="api-port" value="8728" placeholder="API Port" />
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="mb-3">
+                                    <label class="form-label">SNMP Community</label>
+                                    <input type="text" class="form-control" name="snmp-community" id="snmp-community" placeholder="SNMP Community" value="public" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" class="form-control" name="username" id="username" placeholder="Server API username" value="admin" />
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Password</label>
+                                    <input type="text" class="form-control" name="password" id="password" placeholder="Server API password" />
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <% } %>
+                    <% if (locals.action == 'ENABLE') { %>
+                    <form id="form">
+                        <% locals.servers.map(server => { %>
+                        <label class="form-selectgroup-item flex-fill mb-2">
+                            <input type="radio" name="server-id" value="<%= server.id %>" class="form-selectgroup-input" checked>
+                            <div class="form-selectgroup-label d-flex align-items-center p-3">
+                                <div class="me-3">
+                                    <span class="form-selectgroup-check"></span>
+                                </div>
+                                <div class="form-selectgroup-label-content d-flex align-items-center" style="text-align: left !important;">
+                                    <div>
+                                        <div class="font-weight-medium"><%= server.name %></div>
+                                        <div class="text-muted"><%= server.comment %> - <%= server.connectTo %></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                        <% }) %>
+                    </form>
+                    <% } %>
+                </div>
+            </div>
+            <div class="row align-items-center mt-3">
+                <div class="col">
+                    <div class="btn-list justify-content-end">
+                        <a href="javascript:void(0)" onclick="runAction('<%= locals.action %>')" class="btn btn-primary">
+                            Continue
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Libs JS -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="/assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/assets/vendor/axios/axios.min.js"></script>
+    <script src="/assets/js/utils.js"></script>
+    <script>
+        function runAction(action) {
+            var fd = serializeFormData(document.getElementById('form'), {
+                enabled: true,
+                fromCase: 'kebab',
+                toCase: 'camel'
+            });
+            window[action.toLowerCase()](fd);
+        }
+
+        function enable(fd) {
+            axios.post(`/api/server/${fd.serverId}?_method=PATCH`, {
+                enabled: true
+            }).then(function (response) {
+                if (response.data.status === 'success') {
+                    selectServer(fd.serverId);
+                }
+            }).catch(function (error) {
+
+            });
+        }
+
+        function select(fd) {
+            selectServer(fd.serverId);
+        }
+
+        function serverChanged() {
+            window.location.href = "/";
+        }
+
+        function create(fd) {
+            axios.post(`/api/server/create`, fd).then(function (response) {
+                if (response.data.status === 'success') {
+                    selectServer(response.data.data.id);
+                }
+            }).catch(function (error) {
+
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server - DNMS</title>
+    <!-- HEAD -->
+    <%- include('../partials/head') %>
+</head>
+
+<body class="antialiased">
+    <div class="page">
+        <!-- HEADER  -->
+        <%- include('../partials/header') %>
+
+        <div class="content">
+            <div class="container-xl">
+                <!-- PAGE HEADER  -->
+                <div class="page-header d-print-none">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <!-- Page pre-title -->
+                            <div class="page-pretitle">Manage</div>
+                            <div class="page-pretitle">
+                                <h2 class="page-title">Server</h2>
+                            </div>
+                        </div>
+                        <!-- Page title actions -->
+                        <div class="col-auto ms-auto d-print-none">
+                            <div class="btn-list">
+                                <span class="d-none d-sm-inline">
+                                    <a href="" class="btn btn-white"> Refresh Log </a>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- CONTENT  -->
+                <div class="row row-deck row-cards">
+                    <div class="card">
+                        <div class="card-body">
+                            <form onsubmit="showLog(event)" id="form-log">
+                                <div class="form-group mb-3 row">
+                                    <label class="form-label col-3 col-form-label">Filter Topic</label>
+                                    <div class="col-7">
+                                        <select name="topic" class="form-control">
+                                            <option value="none">Show All Logs</option>
+                                            <option value="critical">critical</option>
+                                            <option value="error">error</option>
+                                            <option value="warning">warning</option>
+                                            <option value="info">info</option>
+                                            <option value="system">system</option>
+                                            <option value="account">account</option>
+                                            <option value="script">script</option>
+                                            <option value="dns">dns</option>
+                                            <option value="dhcp">dhcp</option>
+                                            <option value="wireless">wireless</option>
+                                            <option value="debug">debug</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-2 text-end">
+                                        <button type="submit" class="btn btn-primary">Show Log</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="table-responsive">
+                                <table class="table table-vcenter card-table" id="table-log">
+                                    <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>Topics</th>
+                                            <th>Message</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td></td>
+                                            <td class="text-muted"></td>
+                                            <td class="text-muted"></td>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- FOOTER  -->
+            <%- include('../partials/footer') %>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT  -->
+    <%- include('../partials/javascript') %>
+    <script>
+        var logs = [
+            /* beautify preserve:start */
+            <% if (locals.result && locals.result.status === 'success') { %>
+                <% locals.result.data.forEach(function (log) { %>
+                    {
+                        time: '<%= log['time'] %>',
+                        topics: '<%= log['topics'] %>',
+                        message: '<%= log['message'] %>',
+                    },
+                <% }) %>
+            <% } %>
+            /* beautify preserve:end */
+        ];
+        docReady(function () {
+            showLog()
+        });
+
+        function showLog(event) {
+            if (event !== undefined) {
+                event.preventDefault();
+            }
+            document.querySelector('#table-log tbody').innerHTML = '';
+
+            function renderTable(logs = Array()) {
+                if (logs.length <= 0) {
+                    logRow = document.createElement('tr');
+                    logRow.innerHTML = `<tr><td colspan="3"><div class="empty"><div class="empty-img"><img src="/assets/vendor/tabler/static/illustrations/undraw_quitting_time_dm8t.svg" height="128" alt=""></div><p class="empty-title">No results found</p><p class="empty-subtitle text-muted"> Try adjusting your search or filter to find what you're looking for.</p></div></td></tr>`;
+                    document.querySelector('#table-log tbody').append(logRow);
+                } else {
+                    logs.map(function (log) {
+                        logRow = document.createElement('tr');
+                        logRow.innerHTML = /*html*/ `
+                            <td>${log['time']}</td>
+                            <td>${log['topics']}</td>
+                            <td>${log['message']}</td>`;
+                        document.querySelector('#table-log tbody').append(logRow);
+                    })
+                }
+            }
+            var filter = serializeFormData(document.getElementById('form-log'));
+            var tempData = Array();
+            logs.map(function (log) {
+                if (filter.topic == 'none') {
+                    tempData.push(log);
+                } else {
+                    if (log.topics.includes(filter.topic)) {
+                        tempData.push(log);
+                    }
+                }
+            });
+            renderTable(tempData);
+        }
+    </script>
+</body>
+
+</html>

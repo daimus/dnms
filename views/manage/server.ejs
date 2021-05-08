@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Server - DNMS</title>
+  <!-- HEAD -->
+  <%- include('../partials/head') %>
+</head>
+
+<body class="antialiased">
+  <div class="page">
+    <!-- HEADER  -->
+    <%- include('../partials/header') %>
+
+    <div class="content">
+      <div class="container-xl">
+        <!-- PAGE HEADER  -->
+        <div class="page-header d-print-none">
+          <div class="row align-items-center">
+            <div class="col">
+              <!-- Page pre-title -->
+              <div class="page-pretitle">Manage</div>
+              <div class="page-pretitle">
+                <h2 class="page-title">Server</h2>
+              </div>
+            </div>
+            <!-- Page title actions -->
+            <div class="col-auto ms-auto d-print-none">
+              <div class="btn-list">
+                <a href="#" class="btn btn-primary d-sm-inline-block" onclick="create()">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                    stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  <span class="">Add new server</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- CONTENT  -->
+        <!-- Item Length Selector & Search Form  -->
+        <div class="d-flex justify-content-between">
+          <div class="align-items-start">
+            <div class="mb-3">
+              <select class="form-select" id="size" onchange="load()">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+          </div>
+          <div class="align-items-end">
+            <div class="input-icon mb-3">
+              <input type="text" class="form-control" placeholder="Search…" onchange="load()" id="keyword"
+                autocomplete="off" />
+              <span class="input-icon-addon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                  stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <circle cx="10" cy="10" r="7" />
+                  <line x1="21" y1="21" x2="15" y2="15" />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- Table  -->
+        <div class="row row-deck row-cards">
+          <div class="col-12">
+            <div class="card">
+              <table class="table table-vcenter table-mobile-md card-table" id="table-server">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Info</th>
+                    <th>Status</th>
+                    <th class="w-2"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- tbody  -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- Data Count Info & Pagination  -->
+        <div class="d-flex justify-content-between mt-3">
+          <div class="align-items-start">
+            <p id="shown-items-info"></p>
+          </div>
+          <div class="align-items-end">
+            <ul class="pagination" id="pagination">
+
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- FOOTER  -->
+      <%- include('../partials/footer') %>
+    </div>
+  </div>
+  <!-- Modal form server  -->
+  <div class="modal modal-blur fade" id="modal-form-server" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <form onsubmit="save(event)" id="form-server">
+          <div class="modal-header">
+            <h5 class="modal-title"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <!-- Server Info Section  -->
+          <div class="modal-body">
+            <input type="hidden" name="id" id="id" />
+            <div class="mb-3">
+              <label class="form-label">Name</label>
+              <input type="text" class="form-control" name="name" id="name" placeholder="Server name" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Comment</label>
+              <textarea name="comment" id="comment" rows="2" class="form-control"
+                placeholder="Server comment or note"></textarea>
+            </div>
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label class="form-label">Latitude</label>
+                  <input type="text" class="form-control" name="latitude" id="latitude" value="0"
+                    placeholder="Latitude" />
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label class="form-label">Longitude</label>
+                  <input type="text" class="form-control" name="longitude" id="longitude" value="0"
+                    placeholder="Longitude" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Connect To</label>
+              <input type="text" class="form-control" name="connect-to" id="connect-to"
+                placeholder="Server IP or domain" required />
+            </div>
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label class="form-label">API Port</label>
+                  <input type="text" class="form-control" name="api-port" id="api-port" value="8728"
+                    placeholder="API Port" />
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label class="form-label">Username</label>
+                  <input type="text" class="form-control" name="username" id="username"
+                    placeholder="Server API username" value="admin" />
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label class="form-label">Password</label>
+                  <input type="text" class="form-control" name="password" id="password"
+                    placeholder="Server API password" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">Cancel</a>
+            <button class="btn btn-primary ms-auto" type="submit">
+              <span class="spinner-border spinner-border-sm me-2 state-loading d-none" role="status"></span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-device-floppy state-normal"
+                width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FFFFFF" fill="none"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" />
+                <circle cx="12" cy="14" r="2" />
+                <polyline points="14 4 14 8 8 8 8 4" />
+              </svg>
+              Save change
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Modal confirmation delete server  -->
+  <div class="modal modal-blur fade" id="modal-delete-server" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-status bg-danger"></div>
+        <div class="modal-body text-center py-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg" width="24" height="24"
+            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M12 9v2m0 4v.01" />
+            <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" />
+          </svg>
+          <h3>Are you sure?</h3>
+          <div class="text-muted">
+            Do you really want to remove
+            <span class="server-name font-weight-bold"></span>? What you've done
+            cannot be undone.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="w-100">
+            <div class="row">
+              <div class="col">
+                <a href="#" class="btn btn-white w-100" data-bs-dismiss="modal">Cancel</a>
+              </div>
+              <div class="col">
+                <a href="javascript:void(0)" id="button-confirm-delete" class="btn btn-danger w-100"
+                  onclick="destroy(null, true)">
+                  <span class="spinner-border spinner-border-sm me-2 state-loading d-none" role="status"></span> Delete
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- JAVASCRIPT  -->
+  <%- include('../partials/javascript') %>
+  <script>
+    var modalFormServer = new bootstrap.Modal(
+      document.getElementById('modal-form-server')
+    );
+    var modalDeleteServer = new bootstrap.Modal(
+      document.getElementById('modal-delete-server')
+    );
+    docReady(function () {
+      load();
+    });
+
+    function serverChanged() {
+      load();
+    }
+
+    function load(currentPage = 1) {
+      document.querySelector('#table-server tbody').innerHTML = '';
+      document.querySelector('#table-server tbody').innerHTML =
+        `<tr><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td></tr>`;
+
+      let size = document.getElementById('size').value;
+      let keyword = document.getElementById('keyword').value;
+      axios.get(`/api/server?page=${currentPage}&size=${size}&keyword=${keyword}`).then(function (response) {
+        if (response.data.status === 'success') {
+          let tbody = '';
+          if (response.data.data.rows.length <= 0) {
+            tbody = `<tr>
+                <td colspan="4">
+                  <div class="empty">
+                    <div class="empty-img"><img src="/assets/vendor/tabler/static/illustrations/undraw_quitting_time_dm8t.svg" height="128" alt=""></div>
+                    <p class="empty-title">No results found</p>
+                    <p class="empty-subtitle text-muted"> Try adjusting your search or filter to find what you're looking for.</p>
+                  </div>
+                </td>
+              </tr>`;
+            document.getElementById('pagination').innerHTML = '';
+            document.getElementById('shown-items-info').innerHTML = '';
+          } else {
+            let firstIndexRow = (currentPage - 1) * parseInt(size);
+            document.getElementById('shown-items-info').innerHTML = response.data.data.rows.length > 0 ?
+              `${firstIndexRow + 1} - ${firstIndexRow + response.data.data.rows.length} of ${response.data.data.count} Items` :
+              `0 Item`;
+
+            let totalPage = Math.ceil(response.data.data.count / size);
+            /* beautify preserve:start */
+              let prevButton = currentPage > 1 ? `<li class="page-item"> <a class="page-link" href="javascript:void(0)" onclick='load(${currentPage - 1})' tabindex="-1"> <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <polyline points="15 6 9 12 15 18" /> </svg> prev </a></li>` : `<li class="page-item disabled"> <a class="page-link" href="#" tabindex="-1" aria-disabled="true"> <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <polyline points="15 6 9 12 15 18" /> </svg> prev </a></li>`;
+              let nextButton = currentPage < totalPage ? `<li class="page-item"> <a class="page-link" href="javascript:void(0)" onclick='load(${currentPage + 1})'> next <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <polyline points="9 6 15 12 9 18" /> </svg> </a></li>` : `<li class="page-item disabled"> <a class="page-link" href="#" aria-disabled="true"> next <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <polyline points="9 6 15 12 9 18" /> </svg> </a></li>`;
+              /* beautify preserve:end */
+            let pagination = prevButton;
+            for (let i = 1; i <= totalPage; i++) {
+              if (i == currentPage) {
+                pagination +=
+                  `<li class="page-item active"><a class="page-link" href="javascript:void(0)" onclick='load(${i})'>${i}</a></li>`;
+              } else {
+                pagination +=
+                  `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick='load(${i})'>${i}</a></li>`;
+              }
+            }
+            pagination += nextButton;
+            document.getElementById('pagination').innerHTML = pagination;
+            response.data.data.rows.forEach(function (server) {
+              /* beautify preserve:start */
+                tbody += `<tr><td data-label="Name"><div class="d-flex py-1 align-items-center"><div class="flex-fill"><div class="font-weight-medium">${server.name}</div><div class="text-muted"> <a href="#" class="text-reset">${server.comment}</a></div></div></div></td><td data-label="Info"><div>${server.connectTo}@${server.username}</div><div class="text-muted">API: ${server.apiPort} </div></td><td data-label="Status"><div>${server.selected ? '<span class="badge bg-blue">active</span>' : ''}</div><div class="text-muted">${server.enabled ? '<span class="badge bg-green">enabled</span>' : '<span class="badge bg-red">disabled</span>'}</div></td><td><div class="btn-list flex-nowrap"> <a href="javascript:void(0)" class="btn btn-white" onclick='edit(${JSON.stringify(server)})'> Edit </a><div class="dropdown"> <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown" > Actions </button><div class="dropdown-menu dropdown-menu-end"> <a class="dropdown-item" href="javascript:void(0)" onclick='enable(${server.id}, ${!server.enabled})'> ${server.enabled ? 'Disable' : 'Enable'} </a> <a class="dropdown-item" href="javascript:void(0)" onclick='destroy(${JSON.stringify(server)})'> Delete </a></div></div></div></td></tr>`;
+                /* beautify preserve:end */
+            });
+          }
+          document.querySelector('#table-server tbody').innerHTML = tbody;
+        } else {
+          swal("Aww!", "There is problem when loading data! See details in console.", "error");
+          console.error(response);
+        }
+      }).catch(function (error) {
+        swal("Aww!", "There is problem when loading data! See details in console.", "error");
+        console.error(response);
+      });
+    }
+
+    function create() {
+      document.getElementById('id').value = '';
+      document.querySelector('#modal-form-server .modal-title').innerHTML = 'Add new server';
+      document.getElementById('form-server').reset();
+      modalFormServer.show();
+    }
+
+    function edit(server) {
+      document.querySelector('#modal-form-server .modal-title').innerHTML = 'Edit server';
+      setFormLoadingState(false);
+      document.getElementById('id').value = server.id;
+      document.getElementById('name').value = server.name;
+      document.getElementById('comment').value = server.comment;
+      document.getElementById('latitude').value = server.latitude;
+      document.getElementById('longitude').value = server.longitude;
+      document.getElementById('connect-to').value = server.connectTo;
+      document.getElementById('api-port').value = server.apiPort;
+      document.getElementById('username').value = server.username;
+      document.getElementById('password').value = server.password;
+      modalFormServer.show();
+    }
+
+    function save(event) {
+      event.preventDefault();
+      setFormLoadingState(true);
+      var server = serializeFormData(document.getElementById('form-server'), {
+        enabled: true,
+        fromCase: 'kebab',
+        toCase: 'camel'
+      });
+      var url = server.id ? `/api/server/${server.id}?_method=PATCH` : `/api/server/create`;
+      axios.post(url, server).then(function (response) {
+        setFormLoadingState(false);
+        if (response.data.status === 'success') {
+          modalFormServer.hide();
+          swal("Awesome!", "Changes has been saved!", "success", {
+            timer: 1000
+          });
+          load();
+        } else {
+          swal("Aww!", "There is problem when saving data!Failed to save data! See details in console.", "error");
+          console.error(response);
+        }
+      }).catch(function (error) {
+        setFormLoadingState(false);
+        swal("Aww!", "There is problem when saving data!! See details in console.", "error");
+        console.error(error);
+      });
+    }
+
+    function destroy(server, deleteImmediately = false) {
+      function setConfirmationButtonLoadingState(isLoading = false) {
+        if (isLoading) {
+          document.querySelector('#modal-delete-server .state-loading').classList.remove('d-none');
+        } else {
+          document.querySelector('#modal-delete-server .state-loading').classList.add('d-none');
+        }
+      }
+      setConfirmationButtonLoadingState(false);
+      document.querySelector('#modal-delete-server .server-name').innerHTML = server.name;
+      modalDeleteServer.show();
+      document.getElementById('button-confirm-delete').setAttribute('onclick',
+        `destroy(${JSON.stringify(server)}, true)`);
+      if (deleteImmediately) {
+        setConfirmationButtonLoadingState(true);
+        axios.post(`/api/server/${server.id}?_method=DELETE`).then(function (response) {
+          setConfirmationButtonLoadingState(false);
+          if (response.data.status === 'success') {
+            modalDeleteServer.hide();
+            swal("Good!", "Delete data successfull!", "success", {timer: 1000});
+            load();
+          } else {
+            swal("Aww!", "There is problem when deleting data!! See details in console.", "error");
+            console.error(response);
+          }
+        }).catch(function (error) {
+          setConfirmationButtonLoadingState(false);
+          swal("Aww!", "There is problem when deleting data!! See details in console.", "error");
+          console.error(error);
+        });
+      }
+    }
+
+    function enable(serverId, enabled) {
+      axios.post(`/api/server/${serverId}?_method=PATCH`, {
+        enabled: enabled
+      }).then(function (response) {
+        if (response.data.status === 'success') {
+          swal("Good!", "Enabling data successfull!", "success", {timer: 1000});
+          load();
+        } else {
+          swal("Aww!", "There is problem when enabling/disabling data! See details in console.", "error");
+          console.error(response);
+        }
+      }).catch(function (error) {
+        swal("Aww!", "There is problem when enabling/disabling! See details in console.", "error");
+        console.error(error);
+      });
+    }
+
+    function setFormLoadingState(isLoading = true) {
+      if (isLoading) {
+        document.querySelector('#form-server .state-loading').classList.remove('d-none');
+        document.querySelector('#form-server .state-normal').classList.add('d-none');
+      } else {
+        document.querySelector('#form-server .state-normal').classList.remove('d-none');
+        document.querySelector('#form-server .state-loading').classList.add('d-none');
+      }
+    }
+  </script>
+</body>
+
+</html>

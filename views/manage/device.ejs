@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Device - DNMS</title>
+  <!-- HEAD -->
+  <%- include('../partials/head') %>
+</head>
+
+<body class="antialiased">
+  <div class="page">
+    <!-- HEADER  -->
+    <%- include('../partials/header') %>
+
+    <div class="content">
+      <div class="container-xl">
+        <!-- PAGE HEADER  -->
+        <div class="page-header d-print-none">
+          <div class="row align-items-center">
+            <div class="col">
+              <!-- Page pre-title -->
+              <div class="page-pretitle">Manage</div>
+              <div class="page-pretitle">
+                <h2 class="page-title">Device</h2>
+              </div>
+            </div>
+            <!-- Page title actions -->
+            <div class="col-auto ms-auto d-print-none">
+              <div class="btn-list">
+                <div class="dropdown">
+                  <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown">
+                    <!-- SVG icon code -->
+                    Discover
+                  </button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" href="javascript:void(0)" onclick="discover('neighbor')">
+                      Neighbor
+                    </a>
+                    <a class="dropdown-item" href="javascript:void(0)" onclick="discover('arp')">
+                      ARP
+                    </a>
+                    <a class="dropdown-item" href="javascript:void(0)" onclick="discover('lease')">
+                      DHCP Lease
+                    </a>
+                    <a class="dropdown-item" href="javascript:void(0)" onclick="discover('host')">
+                      Hotspot Host
+                    </a>
+                  </div>
+                </div>
+                <a href="#" class="btn btn-primary d-sm-inline-block" onclick="create()">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  <span class="">Add device</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- CONTENT  -->
+        <!-- Item Length Selector & Search Form  -->
+        <div class="d-flex justify-content-between">
+          <div class="align-items-start">
+            <div class="mb-3">
+              <select class="form-select" id="size" onchange="load()">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+          </div>
+          <div class="align-items-end">
+            <div class="input-icon mb-3">
+              <input type="text" class="form-control" placeholder="Search…" onchange="load()" id="keyword" autocomplete="off" />
+              <span class="input-icon-addon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <circle cx="10" cy="10" r="7" />
+                  <line x1="21" y1="21" x2="15" y2="15" />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- Table  -->
+        <div class="row row-deck row-cards">
+          <div class="col-12">
+            <div class="card">
+              <table class="table table-vcenter table-mobile-md card-table" id="table-device">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Info</th>
+                    <th>Status</th>
+                    <th class="w-2"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- tbody  -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- Data Count Info & Pagination  -->
+        <div class="d-flex justify-content-between mt-3">
+          <div class="align-items-start">
+            <p id="shown-items-info"></p>
+          </div>
+          <div class="align-items-end">
+            <ul class="pagination" id="pagination">
+
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- FOOTER  -->
+      <%- include('../partials/footer') %>
+    </div>
+  </div>
+  <!-- Discover Modal  -->
+  <div class="modal modal-blur fade" id="modal-discover" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Discover Device</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <table class="table" id="table-discovery">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Address</th>
+                <th class="w-1"></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal form device  -->
+  <div class="modal modal-blur fade" id="modal-form-device" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <form onsubmit="save(event)" id="form-device">
+          <div class="modal-header">
+            <h5 class="modal-title"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <!-- device Info Section  -->
+          <div class="modal-body">
+            <input type="hidden" name="id" id="id" />
+            <div class="mb-3">
+              <label class="form-label">Name</label>
+              <input type="text" class="form-control" name="name" id="name" placeholder="Device name" required autocomplete="off" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Comment</label>
+              <textarea name="comment" id="comment" rows="2" class="form-control" placeholder="Device comment or note"></textarea>
+            </div>
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label class="form-label">Latitude</label>
+                  <input type="text" value="0" class="form-control" name="latitude" id="latitude" placeholder="Device Latitude" autocomplete="off" />
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label class="form-label">Longitude</label>
+                  <input type="text" value="0" class="form-control" name="longitude" id="longitude" placeholder="Device Longitude" autocomplete="off" />
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Operating System</label>
+              <select name="os" id="os" class="form-control">
+                <option value="routeros">Router OS</option>
+                <option value="airos">Air OS</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Connected To</label>
+              <select name="connected-to" id="connected-to" class="form-control">
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" name="wireless" id="wireless">
+                <span class="form-check-label">
+                  Wireless ?
+                </span>
+                <span class="form-check-description">
+                  Device has wireless interface that can be monitor with SNMP service. Currently support: MikroTik or UBNT wireless device
+                </span>
+              </label>
+            </div>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label class="form-label">Connect To</label>
+                  <input type="text" class="form-control" name="connect-to" id="connect-to" placeholder="Device IP or domain" required autocomplete="off" />
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label class="form-label">SNMP Community</label>
+                  <input type="text" class="form-control" name="snmp-community" id="snmp-community" placeholder="SNMP Community" value="public" autocomplete="off" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">Cancel</a>
+            <button class="btn btn-primary ms-auto" type="submit">
+              <span class="spinner-border spinner-border-sm me-2 state-loading d-none" role="status"></span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-device-floppy state-normal" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FFFFFF" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" />
+                <circle cx="12" cy="14" r="2" />
+                <polyline points="14 4 14 8 8 8 8 4" />
+              </svg>
+              Save change
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Modal confirmation delete device  -->
+  <div class="modal modal-blur" id="modal-delete-device" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable" role="document">
+      <div class="modal-content">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-status bg-danger"></div>
+        <div class="modal-body text-center py-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M12 9v2m0 4v.01" />
+            <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" />
+          </svg>
+          <h3>Are you sure?</h3>
+          <div class="text-muted">
+            Do you really want to remove
+            <span class="device-name font-weight-bold"></span>? What you've done
+            cannot be undone.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="w-100">
+            <div class="row">
+              <div class="col">
+                <a href="#" class="btn btn-white w-100" data-bs-dismiss="modal">Cancel</a>
+              </div>
+              <div class="col">
+                <a href="javascript:void(0)" id="button-confirm-delete" class="btn btn-danger w-100" onclick="destroy(null, true)">
+                  <span class="spinner-border spinner-border-sm me-2 state-loading d-none" role="status"></span> Delete
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT  -->
+  <%- include('../partials/javascript') %>
+  <script>
+    var modalFormDevice = new bootstrap.Modal(
+      document.getElementById('modal-form-device')
+    );
+    var modalDeleteDevice = new bootstrap.Modal(
+      document.getElementById('modal-delete-device')
+    );
+    var modalDiscover = new bootstrap.Modal(
+      document.getElementById('modal-discover')
+    );
+    docReady(function () {
+      load();
+      loadAll();
+    });
+
+    function serverChanged() {
+      load();
+      loadAll();
+    }
+
+    function discover(source) {
+      modalDiscover.show();
+      if (source === '' || source === null) {
+        return;
+      }
+
+      document.querySelector('#table-discovery tbody').innerHTML = `<tr><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td></tr>`;
+
+      axios.get(`/tool/${source}/?json=true`).then(function (response) {
+        let tbody = '';
+        if (response.data.data.length > 0) {
+          response.data.data.forEach(function (data) {
+            let name, comment, connectTo = '';
+            name = data['host-name'] ? data['host-name'] : '';
+            comment = data['comment'] ? data['comment'] : '';
+            connectTo = data['address'] ? data['address'] : '';
+            name = !name && comment ? comment : name;
+            tbody += `<tr>
+            <td>
+              <div class="font-weight-medium">${name}</div>
+              <div class="text-muted"><span class="text-reset">${comment}</span></div>
+            </td>
+            <td>
+              <div>${connectTo}</div>${data['mac-address'] ? '<div class="text-muted">' + data['mac-address'] + '</div>' : ''}
+            </td>
+            <td><button type="button" class="btn btn-primary" onclick='addDevice(${JSON.stringify({ name: name, comment: comment, connectTo: connectTo })})'>Add Device</button></td>
+          </tr>`;
+          });
+        } else {
+          tbody = `<tr><td colspan="3"><div class="empty"><div class="empty-img"><img src="/assets/vendor/tabler/static/illustrations/undraw_quitting_time_dm8t.svg" height="128" alt=""></div><p class="empty-title">No results found</p><p class="empty-subtitle text-muted"> Try adjusting your search or filter to find what you're looking for.</p></div></td></tr>`;
+        }
+        document.querySelector('#table-discovery tbody').innerHTML = tbody;
+      }).catch(function (error) {
+
+      })
+    }
+
+    function addDevice(device) {
+      document.getElementById('id').value = '';
+      document.querySelector('#modal-form-device .modal-title').innerHTML = 'Add new device';
+      document.getElementById('form-device').reset();
+      document.getElementById('name').value = device.name;
+      document.getElementById('comment').value = device.comment;
+      document.getElementById('connect-to').value = device.connectTo;
+      modalFormDevice.show();
+    }
+
+    async function loadAll() {
+      try {
+        var response = await axios.get(`/api/device?size=0`);
+        if (response.data.status === 'success') {
+          let options = '<option value="0">Server</option>'
+          response.data.data.rows.forEach(function (device) {
+            // Render select
+            options += `<option value="${device.id}">${device.name} - ${device.comment}</option>`;
+          });
+          document.querySelector('#connected-to').innerHTML = options;
+        }
+      } catch (error) {
+        console.log('Error: ', error);
+      }
+    }
+
+    function load(currentPage = 1) {
+      // Reset Table
+      document.querySelector('#table-device tbody').innerHTML = '';
+      // Set table loading
+      document.querySelector('#table-device tbody').innerHTML = `<tr><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td></tr>`;
+
+      // Do request
+      let size = document.getElementById('size').value;
+      let keyword = document.getElementById('keyword').value;
+      axios.get(`/api/device?page=${currentPage}&size=${size}&keyword=${keyword}`).then(function (response) {
+          // Is success: render data
+          if (response.data.status === 'success') {
+            let tbody = '';
+            if (response.data.data.rows.length <= 0) {
+              tbody = `<tr>
+                <td colspan="4">
+                  <div class="empty">
+                    <div class="empty-img"><img src="/assets/vendor/tabler/static/illustrations/undraw_quitting_time_dm8t.svg" height="128" alt=""></div>
+                    <p class="empty-title">No results found</p>
+                    <p class="empty-subtitle text-muted"> Try adjusting your search or filter to find what you're looking for.</p>
+                  </div>
+                </td>
+              </tr>`;
+              document.getElementById('pagination').innerHTML = '';
+              document.getElementById('shown-items-info').innerHTML = '';
+            } else {
+              let firstIndexRow = (currentPage - 1) * parseInt(size);
+              document.getElementById('shown-items-info').innerHTML = response.data.data.rows.length > 0 ? `${firstIndexRow + 1} - ${firstIndexRow + response.data.data.rows.length} of ${response.data.data.count} Items` : `0 Item`;
+
+              let totalPage = Math.ceil(response.data.data.count / size);
+              /* beautify preserve:start */
+              let prevButton = currentPage > 1 ? `<li class="page-item"> <a class="page-link" href="javascript:void(0)" onclick='load(${currentPage - 1})' tabindex="-1"> <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <polyline points="15 6 9 12 15 18" /> </svg> prev </a></li>` : `<li class="page-item disabled"> <a class="page-link" href="#" tabindex="-1" aria-disabled="true"> <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <polyline points="15 6 9 12 15 18" /> </svg> prev </a></li>`;
+              let nextButton = currentPage < totalPage ? `<li class="page-item"> <a class="page-link" href="javascript:void(0)" onclick='load(${currentPage + 1})'> next <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <polyline points="9 6 15 12 9 18" /> </svg> </a></li>` : `<li class="page-item disabled"> <a class="page-link" href="#" aria-disabled="true"> next <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <polyline points="9 6 15 12 9 18" /> </svg> </a></li>`;
+              /* beautify preserve:end */
+              let pagination = prevButton;
+              for (let i = 1; i <= totalPage; i++) {
+                if (i == currentPage) {
+                  pagination += `<li class="page-item active"><a class="page-link" href="javascript:void(0)" onclick='load(${i})'>${i}</a></li>`;
+                } else {
+                  pagination += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick='load(${i})'>${i}</a></li>`;
+                }
+              }
+              pagination += nextButton;
+              document.getElementById('pagination').innerHTML = pagination;
+              response.data.data.rows.forEach(function (device) {
+                // Render table
+                /* beautify preserve:start */
+                tbody += `<tr><td data-label="Name"><div class="d-flex py-1 align-items-center"><div class="flex-fill"><div class="font-weight-medium">${device.name}</div><div class="text-muted"><span class="text-reset">${device.comment}</span></div></div></div></td><td data-label="Info"><div>${device.connectTo}</div> <div class="text-muted">OS: ${device.os} Community: ${device.snmpCommunity}</div></td> <td data-label="Status"><div class="text-muted">${device.enabled ? '<span class="badge bg-green">enabled</span> ' : ' <span class="badge bg-red"> disabled </span>'} </div></td><td><div class="btn-list flex-nowrap"> <a href="javascript:void(0)" class="btn btn-white" onclick='edit(${JSON.stringify(device)})'> Edit </a><div class="dropdown"><button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown"> Actions</button><div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="javascript:void(0)" onclick='enable(${device.id}, ${!device.enabled})'> ${device.enabled ? 'Disable' : 'Enable'}</a><a class="dropdown-item" href="javascript:void(0)" onclick='destroy(${JSON.stringify({id: device.id, name: device.name})})'>Delete</a> </div></div></div></td></tr>`;
+                    /* beautify preserve:end */
+              });
+            }
+            document.querySelector('#table-device tbody').innerHTML = tbody;
+          }
+          // Is error: show error
+        })
+        .catch(function (error) {
+          // Unset table loading
+          // Show error
+          console.log('Error: ', error);
+        });
+    }
+
+    function create() {
+      document.getElementById('id').value = '';
+      document.querySelector('#modal-form-device .modal-title').innerHTML = 'Add new device';
+      document.getElementById('form-device').reset();
+      modalFormDevice.show();
+    }
+
+    function edit(device) {
+      document.querySelector('#modal-form-device .modal-title').innerHTML = 'Edit device';
+      // Unset loading state form
+      setFormLoadingState(false);
+      // Apply selected data to form
+      document.getElementById('id').value = device.id;
+      document.getElementById('name').value = device.name;
+      document.getElementById('comment').value = device.comment;
+      document.getElementById('connect-to').value = device.connectTo;
+      document.getElementById('snmp-community').value = device.snmpCommunity;
+      document.getElementById('latitude').value = device.latitude;
+      document.getElementById('longitude').value = device.longitude;
+      document.getElementById('os').value = device.os;
+      document.getElementById('wireless').checked = device.wireless;
+      document.getElementById('connected-to').value = device.connectedTo;
+      // Trigger modal form
+      modalFormDevice.show();
+    }
+
+    function save(event) {
+      event.preventDefault();
+      // Set button loading
+      setFormLoadingState(true);
+      // Do request
+      var device = serializeFormData(document.getElementById('form-device'), {
+        enabled: true,
+        fromCase: 'kebab',
+        toCase: 'camel'
+      });
+      var url = device.id ? `/api/device/${device.id}?_method=PATCH` : `/api/device/create`;
+      axios
+        .post(url, device)
+        .then(function (response) {
+          // Unset button loading
+          setFormLoadingState(false);
+          // If success: hide modal; call load func
+          if (response.data.status === 'success') {
+            modalFormDevice.hide();
+            load();
+            loadAll();
+          }
+          // If !success: trigger alert
+        })
+        .catch(function (error) {
+          // Unset button loading
+          setFormLoadingState(false);
+          // Trigger alert
+          console.log('Error: ', error);
+        });
+    }
+
+    function destroy(device, deleteImmediately = false) {
+      function setConfirmationButtonLoadingState(isLoading = false) {
+        if (isLoading) {
+          document.querySelector('#modal-delete-device .state-loading').classList.remove('d-none');
+        } else {
+          document.querySelector('#modal-delete-device .state-loading').classList.add('d-none');
+        }
+      }
+      setConfirmationButtonLoadingState(false);
+      document.querySelector('#modal-delete-device .device-name').innerHTML = device.name;
+      // Trigger confirmation modal
+      modalDeleteDevice.show();
+      document.getElementById('button-confirm-delete').setAttribute('onclick', `destroy(${JSON.stringify(device)}, true)`);
+      if (deleteImmediately) {
+        // Set loading
+        setConfirmationButtonLoadingState(true);
+        // Do request
+        axios.post(`/api/device/${device.id}?_method=DELETE`).then(function (response) {
+          // Unset loading
+          setConfirmationButtonLoadingState(false);
+          if (response.data.status === 'success') {
+            // If success: hide modal, load
+            modalDeleteDevice.hide();
+            load();
+            loadAll();
+          }
+        }).catch(function (error) {
+          // Unset loading
+          setConfirmationButtonLoadingState(false);
+        });
+      }
+    }
+
+    function enable(deviceId, enabled) {
+      // Do request
+      axios.post(`/api/device/${deviceId}?_method=PATCH`, {
+        enabled: enabled
+      }).then(function (response) {
+        if (response.data.status === 'success') {
+          load();
+        }
+      }).catch(function (error) {
+
+      });
+    }
+
+    function setFormLoadingState(isLoading = true) {
+      if (isLoading) {
+        document.querySelector('#form-device .state-loading').classList.remove('d-none');
+        document.querySelector('#form-device .state-normal').classList.add('d-none');
+      } else {
+        document.querySelector('#form-device .state-normal').classList.remove('d-none');
+        document.querySelector('#form-device .state-loading').classList.add('d-none');
+      }
+    }
+  </script>
+</body>
+
+</html>
