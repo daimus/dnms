@@ -95,7 +95,7 @@ const oids = {
 
 module.exports.getSections = async (sections, device, options = {}) => {
     let result = {};
-    if (device.os !== 'routeros' || device.os !== 'airos'){
+    if (device.os !== 'routeros' && device.os !== 'airos'){
         return result;
     }
     for (const oid of oids[device.os]) {
