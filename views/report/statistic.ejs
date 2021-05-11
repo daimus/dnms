@@ -89,7 +89,7 @@
 						name: "Usage Statistic",
 						data: [
 							<% locals.usageStat.forEach(function (queue) { %>
-								parseFloat(<%= queue.totalBytes / 1000000000 %>.toFixed(3)),
+								parseFloat(<%= queue.totalBytes / 1000000000 %>).toFixed(3),
 							<% }) %>
 						]
 					}],
