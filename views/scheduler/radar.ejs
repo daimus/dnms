@@ -127,9 +127,6 @@
             devices.forEach(function (element) {
                 if (element.getAttribute('data-name').toLowerCase().includes(keyword.toLowerCase())) {
                     element.classList.remove('d-none');
-                    if (selectedDevices.indexOf(element.getAttribute('data-id')) >= 0) {
-                        element.querySelector('input').checked = true;
-                    }
                 } else {
                     element.classList.add('d-none');
                 }
