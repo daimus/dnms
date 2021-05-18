@@ -1,4 +1,5 @@
 const netSnmp = require('net-snmp');
+const {logger} = require('../config/logger');
 
 const oids = {
     routeros: [{
