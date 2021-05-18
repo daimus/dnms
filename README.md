@@ -38,8 +38,9 @@ $ node app.js
 
 I can't provide live preview of this app. But here some screenshoots to give you an insight about this app.
 
-![Screenshot](https://raw.githubusercontent.com/daimus/dnms/main/screenshoots/Screen%20Shot%202021-05-09%20at%2011.22.40%20(2).png?token=AD5WSOI24LJ2DYXJBVJNOZ3AS5SSA)
-![Screenshot](https://raw.githubusercontent.com/daimus/dnms/main/screenshoots/Screen%20Shot%202021-05-09%20at%2011.23.52%20(2).png?token=AD5WSOJ6OBYXGXEZSQ3EMLLAS5SVU)
-![Screenshot](https://raw.githubusercontent.com/daimus/dnms/main/screenshoots/Screen%20Shot%202021-05-09%20at%2011.24.53%20(2).png?token=AD5WSOIICO7DSVLKWKUL3QDAS5SPE)
-![Screenshot](https://raw.githubusercontent.com/daimus/dnms/main/screenshoots/Screen%20Shot%202021-05-09%20at%2011.25.10%20(2).png?token=AD5WSOPBJW3KNBRSAPTRKDTAS5SW2)
+![Screenshot](https://1.bp.blogspot.com/-toUGHq34tzA/YJzrpZaVIuI/AAAAAAAADU4/FpkeurL9ThctwDZF33sPpA5hbQ-b2PDmQCLcBGAsYHQ/s16000/dashboard.jpg)
+![Screenshot](https://1.bp.blogspot.com/-qB-lCxOI7OQ/YJzrpYkyPGI/AAAAAAAADU0/6JguPbVKr8I_DJZr1qvWPCV_EpvDTMSZgCLcBGAsYHQ/s16000/diagram.jpg)
+![Screenshot](https://1.bp.blogspot.com/-nXIOWjXUUqM/YJzrpZR9hvI/AAAAAAAADU8/3ci70mFzE8gZrL12uLjBtuRrjLbaW8e9gCLcBGAsYHQ/s16000/manage.jpg)
+![Screenshot](https://1.bp.blogspot.com/-SAgy4ySaUUo/YJzrp0qQfxI/AAAAAAAADVA/fTWRJFgTECQAtB11Ccs1LimBKTD6OVNiACLcBGAsYHQ/s16000/map.jpg)
+![Screenshot](https://1.bp.blogspot.com/-TEUBewBloe4/YJzrqG95EjI/AAAAAAAADVE/V9MNjq4DwQcIM5e3RDbaXXPBL1u7M6q3gCLcBGAsYHQ/s16000/monitor.jpg)
 
