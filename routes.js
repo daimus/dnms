@@ -68,7 +68,7 @@ let routes = (app) => {
     // API ROUTES 
     router.get('/api/server', RAS, server.get);
     router.post('/api/server/selectSite', server.selectSite);
-    router.post('/api/server/create', RAS, server.create);
+    router.post('/api/server/create', redirectUnauthenticated, server.create);
     router.patch('/api/server/:serverId', RAS, server.update);
     router.delete('/api/server/:serverId', RAS, server.destroy);
 
