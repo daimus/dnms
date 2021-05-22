@@ -46,6 +46,7 @@ exports.create = async (req, res) => {
     data.latitude = parseFloat(req.body.latitude) ? parseFloat(req.body.latitude) : 0;
     data.longitude = parseFloat(req.body.longitude) ? parseFloat(req.body.longitude) : 0;
     data.wireless = req.body.wireless ? true : false;
+    data.serverId = req.session.serverId;
     await Device.create(data).then(result => {
         res.jsend.success(result);
     }).catch(error => {
