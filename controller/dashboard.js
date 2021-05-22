@@ -44,8 +44,7 @@ exports.selectServer = async (req, res) => {
     servers.map(server => {
         if (server.enabled) enabledServerCount++;
     });
-
-    if (servers == 1 && enabledServerCount == 1) {
+    if (servers.length == 1 && enabledServerCount == 1) {
         req.session.serverId = servers[0].id;
         return res.redirect('/');
     }
