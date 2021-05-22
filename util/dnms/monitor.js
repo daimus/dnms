@@ -109,6 +109,13 @@ exports.offlineScanner = async (socket, payload) => {
       }
     })
   }
+  if (payload.devices.length === 0){
+    return socket.emit("OFFLINE_SCANNER", {
+      deviceScanned: payload.devices.length,
+      offlineDevice: Array(),
+      done: true
+    });
+  }
   if (payload.live === undefined) {
     payload.live = false;
   }
