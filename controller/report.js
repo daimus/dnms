@@ -18,6 +18,7 @@ exports.statistic = async (req, res) => {
     host: server.connectTo,
     user: server.username,
     password: server.password,
+    port: server.apiPort,
     keepalive: true,
   };
   const connection = mikrotikApi.createConnection(conn);

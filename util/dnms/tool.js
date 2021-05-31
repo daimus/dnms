@@ -9,6 +9,7 @@ exports.ping = async (socket, payload) => {
     host: server.connectTo,
     user: server.username,
     password: server.password,
+    port: server.apiPort,
   };
   const cb = (error, data) => {
     if (error) {
@@ -27,6 +28,7 @@ exports.log = async (socket) => {
     host: server.connectTo,
     user: server.username,
     password: server.password,
+    port: server.apiPort
   };
   const connection = mikrotikApi.createConnection(conn);
   connection.connect().then(async () => {

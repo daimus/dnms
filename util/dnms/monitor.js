@@ -37,6 +37,7 @@ module.exports.device = async (socket, payload) => {
     host: server.connectTo,
     user: server.username,
     password: server.password,
+    port: server.apiPort,
     keepalive: true,
   };
   const connection = mikrotikApi.createConnection(conn);
@@ -176,6 +177,7 @@ exports.dashboard = async (socket, payload) => {
     host: server.connectTo,
     user: server.username,
     password: server.password,
+    port: server.apiPort,
     keepalive: true,
   };
   const connection = mikrotikApi.createConnection(conn);
@@ -241,6 +243,7 @@ exports.traffic = async (socket, payload) => {
     host: server.connectTo,
     user: server.username,
     password: server.password,
+    port: server.apiPort,
     keepalive: true,
   };
   const connection = mikrotikApi.createConnection(conn);

@@ -26,6 +26,7 @@ exports.log = async (req, res) => {
 		host: server.connectTo,
 		user: server.username,
 		password: server.password,
+		port: server.apiPort
 	};
 	const connection = mikrotikApi.createConnection(conn);
 	let result = {};
@@ -59,6 +60,7 @@ exports.arp = async (req, res) => {
 		host: server.connectTo,
 		user: server.username,
 		password: server.password,
+		port: server.apiPort
 	};
 	const connection = mikrotikApi.createConnection(conn);
 	let result = {};
@@ -95,6 +97,7 @@ exports.neighbor = async (req, res) => {
 		host: server.connectTo,
 		user: server.username,
 		password: server.password,
+		port: server.apiPort
 	};
 	const connection = mikrotikApi.createConnection(conn);
 	let result = {};
@@ -131,6 +134,7 @@ exports.lease = async (req, res) => {
 		host: server.connectTo,
 		user: server.username,
 		password: server.password,
+		port: server.apiPort
 	};
 	const connection = mikrotikApi.createConnection(conn);
 	let result = {};
@@ -168,6 +172,7 @@ exports.host = async (req, res) => {
 		host: server.connectTo,
 		user: server.username,
 		password: server.password,
+		port: server.apiPort
 	};
 	const connection = mikrotikApi.createConnection(conn);
 	let result = {};

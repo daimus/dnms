@@ -16,7 +16,9 @@ exports.index = async (req, res) => {
         host: server.connectTo,
         user: server.username,
         password: server.password,
+        port: server.apiPort
     };
+    console.log('conn :>> ', conn);
     const connection = mikrotikApi.createConnection(conn);
     await connection.connect().then(async () => {
         interfaces = await mikrotikApi.write(connection, ['/interface/print']);
