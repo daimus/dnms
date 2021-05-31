@@ -46,14 +46,18 @@ exports.selectServer = async (req, res) => {
     servers.map(server => {
         if (server.enabled) enabledServerCount++;
     });
-    if (servers.length == 1 && enabledServerCount == 1) {
-        req.session.serverId = servers[0].id;
+    if (enabledServerCount === 1) {
+        servers.map(server => {
+            if (server.enabled){
+                req.session.serverId = server.id;
+            };
+        });
         return res.redirect('/');
     }
-    if (serverCount == 0) {
+    if (serverCount === 0) {
         action = 'CREATE';
     }
-    if (serverCount > 1 && enabledServerCount == 0) {
+    if (serverCount > 1 && enabledServerCount === 0) {
         action = 'ENABLE';
     }
     if (serverCount > 1 && enabledServerCount > 1) {
