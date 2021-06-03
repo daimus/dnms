@@ -25,29 +25,31 @@ exports.radar = async (req, res) => {
 }
 
 exports.configureRadar = async (req, res) => {
-    await Device.update({
-        visible: true
-    }, {
-        where: {
-            visible: false
-        }
-    });
-    await Device.update({
-        visible: false
-    }, {
-        where: {
-            id: {
-                [Op.in]: req.body.invisible
+    if (req.body.invisible !== undefined){
+        await Device.update({
+            visible: true
+        }, {
+            where: {
+                visible: false
             }
-        }
-    });
+        });
+        await Device.update({
+            visible: false
+        }, {
+            where: {
+                id: {
+                    [Op.in]: req.body.invisible
+                }
+            }
+        });
+    }
     await Extra.update({
         value: req.body['radar-telegram-report'] ? 1 : 0
     }, {
         where: {
             key: 'radarTelegramReport'
         }
-    })
+    });
     res.redirect('/scheduler/radar');
 }
 
