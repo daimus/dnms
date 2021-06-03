@@ -111,6 +111,12 @@ exports.offlineScanner = async (socket, payload) => {
     })
   }
   if (payload.devices.length === 0){
+    if (socket === null){
+      return {
+        deviceScanned: payload.devices.length,
+        offlineDevice: Array(),
+      }
+    }
     return socket.emit("OFFLINE_SCANNER", {
       deviceScanned: payload.devices.length,
       offlineDevice: Array(),
