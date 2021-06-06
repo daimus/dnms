@@ -161,7 +161,25 @@
 								<h2 class="page-title">Device</h2>
 							</div>
 						</div>
-						
+						<div class="col-auto ms-auto d-print-none">
+                            <div class="btn-list">
+                                <button type="button" class="btn btn-primary" onclick="toggleFullscreen()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrows-maximize"
+                                        width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#fff" fill="#fff"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <polyline points="16 4 20 4 20 8" />
+                                        <line x1="14" y1="10" x2="20" y2="4" />
+                                        <polyline points="8 20 4 20 4 16" />
+                                        <line x1="4" y1="20" x2="10" y2="14" />
+                                        <polyline points="16 20 20 20 20 16" />
+                                        <line x1="14" y1="14" x2="20" y2="20" />
+                                        <polyline points="8 4 4 4 4 8" />
+                                        <line x1="4" y1="4" x2="10" y2="10" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
 					</div>
 				</div>
 				<!-- CONTENT  -->
@@ -170,7 +188,7 @@
 
 					</div>
 					<div class="col-12">
-						<div class="card">
+						<div class="card" id="diagram-container">
 							<form onsubmit="ping(event)" id="form-ping" class="m-4">
 								<div class="form-group mb-3 row">
 									<label class="form-label col-3 col-form-label">Sub Network</label>
@@ -214,6 +232,10 @@
 
 		function serverChanged() {
 			window.location.href = "/monitor/diagram";
+		}
+
+		function toggleFullscreen(){
+			document.getElementById('diagram-container').requestFullscreen();
 		}
 
 		var devices = {
