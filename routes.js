@@ -62,8 +62,7 @@ let routes = (app) => {
     // CRON / SCHEDULER
     router.get('/scheduler/radar', RAS, scheduler.radar);
     router.patch('/scheduler/radar/configure', RAS, scheduler.configureRadar);
-    router.get('/scheduler/radar/run', RAS, scheduler.runRadar);
-    // router.get('/tool/scanner', tool.scanner);
+    router.get('/scheduler/radar/run', scheduler.runRadar);
 
     // API ROUTES 
     router.get('/api/server', RAS, server.get);
