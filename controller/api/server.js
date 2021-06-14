@@ -87,6 +87,9 @@ exports.update = async (req, res) => {
 }
 
 exports.destroy = async (req, res) => {
+    if (req.params.serverId === req.session.serverId){
+        return res.jsend.error('Cannot delete active server!');
+    }
     await Server.destroy({
         where: {
             id: req.params.serverId

@@ -318,11 +318,11 @@
           }
           document.querySelector('#table-server tbody').innerHTML = tbody;
         } else {
-          swal("Aww!", "There is problem when loading data! See details in console.", "error");
+          swal("Aww!", response.data.message, "error");
           console.error(response);
         }
       }).catch(function (error) {
-        swal("Aww!", "There is problem when loading data! See details in console.", "error");
+        swal("Aww!", error.message, "error");
         console.error(response);
       });
     }
@@ -367,12 +367,12 @@
           });
           load();
         } else {
-          swal("Aww!", "There is problem when saving data!Failed to save data! See details in console.", "error");
+          swal("Aww!", response.data.message, "error");
           console.error(response);
         }
       }).catch(function (error) {
         setFormLoadingState(false);
-        swal("Aww!", "There is problem when saving data!! See details in console.", "error");
+        swal("Aww!", error.message, "error");
         console.error(error);
       });
     }
@@ -399,12 +399,12 @@
             swal("Good!", "Delete data successfull!", "success", {timer: 1000});
             load();
           } else {
-            swal("Aww!", "There is problem when deleting data!! See details in console.", "error");
+            swal("Aww!", response.data.message, "error");
             console.error(response);
           }
         }).catch(function (error) {
           setConfirmationButtonLoadingState(false);
-          swal("Aww!", "There is problem when deleting data!! See details in console.", "error");
+          swal("Aww!", error.message, "error");
           console.error(error);
         });
       }
@@ -418,11 +418,11 @@
           swal("Good!", "Enabling data successfull!", "success", {timer: 1000});
           load();
         } else {
-          swal("Aww!", "There is problem when enabling/disabling data! See details in console.", "error");
+          swal("Aww!", response.data.message, "error");
           console.error(response);
         }
       }).catch(function (error) {
-        swal("Aww!", "There is problem when enabling/disabling! See details in console.", "error");
+        swal("Aww!", error.message, "error");
         console.error(error);
       });
     }
