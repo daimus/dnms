@@ -12,11 +12,11 @@ exports.signin = (req, res, next) => {
             return next(err);
         }
         if (!user){
-            return res.render('auth/login', {alert: {
-                status: 'danger',
-                title: 'Ouch!',
+            req.flash('alert', {
+                status: 'error',
                 message: info.message
-            }});
+            });
+            return res.redirect('/login');
         }
         req.logIn(user, (err) => {
             if (err){

@@ -16,32 +16,23 @@
   <title>Sign in - DNMS</title>
   <!-- CSS files -->
   <link href="/assets/vendor/tabler/css/tabler.min.css" rel="stylesheet" />
-  <link href="/assets/vendor/tabler/css/tabler-flags.min.css" rel="stylesheet" />
-  <link href="/assets/vendor/tabler/css/tabler-payments.min.css" rel="stylesheet" />
-  <link href="/assets/vendor/tabler/css/tabler-vendors.min.css" rel="stylesheet" />
-  <link href="/assets/vendor/tabler/css/demo.min.css" rel="stylesheet" />
 </head>
 
 <body class="antialiased border-top-wide border-primary d-flex flex-column">
   <div class="flex-fill d-flex flex-column justify-content-center py-4">
     <div class="container-tight py-6">
-      <div class="text-center mb-4">
-        <a href="."><img src="./static/logo.svg" height="36" alt=""></a>
-      </div>
       <form class="card card-md" action="/login" method="POST" autocomplete="off">
         <div class="card-body">
           <h2 class="card-title text-center mb-4">Login to your account</h2>
-          <% if (locals.alert){ %>
-          <div class="alert alert-<%= alert.status %> alert-dismissible fade show" role="alert">
-            <strong><%= alert.title %></strong> <%= alert.message %>
-            <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
+          <div>
+            <%- include('../partials/alert-message') %>
           </div>
-          <% } %>
           <div class="mb-3">
             <label class="form-label">Username</label>
             <input type="text" name="username" class="form-control" placeholder="Enter username">
           </div>
           <div class="mb-2">
+            <label class="form-label">Password</label>
             <div class="input-group input-group-flat">
               <input type="password" name="password" class="form-control" placeholder="Password" autocomplete="off"
                 value="">
@@ -63,6 +54,9 @@
           </div>
         </div>
       </form>
+      <div class="text-center text-muted mt-3">
+        Don't have account yet? <a href="/register" tabindex="-1">Sign up</a>
+      </div>
     </div>
   </div>
   <!-- Libs JS -->
