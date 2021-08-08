@@ -51,7 +51,8 @@
                   </div>
                 </div>
                 <a href="#" class="btn btn-primary d-sm-inline-block" onclick="create()">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                    stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                     <line x1="12" y1="5" x2="12" y2="19" />
                     <line x1="5" y1="12" x2="19" y2="12" />
@@ -77,9 +78,11 @@
           </div>
           <div class="align-items-end">
             <div class="input-icon mb-3">
-              <input type="text" class="form-control" placeholder="Search…" onchange="load()" id="keyword" autocomplete="off" />
+              <input type="text" class="form-control" placeholder="Search…" onchange="load()" id="keyword"
+                autocomplete="off" />
               <span class="input-icon-addon">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                  stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <circle cx="10" cy="10" r="7" />
                   <line x1="21" y1="21" x2="15" y2="15" />
@@ -133,11 +136,28 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
+          <div class="row g-2 mb-2">
+            <div class="col">
+              <input type="text" class="form-control" placeholder="Search for…" id="device-keyword" onkeyup="filterDevice(this.value)">
+            </div>
+            <div class="col-auto">
+              <button type="button" class="btn btn-primary btn-icon" aria-label="Button"
+                onclick="filterDevice(document.getElementById('device-keyword').value)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                  stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <circle cx="10" cy="10" r="7"></circle>
+                  <line x1="21" y1="21" x2="15" y2="15"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
           <table class="table" id="table-discovery">
             <thead>
               <tr>
                 <th>Name</th>
                 <th>Address</th>
+                <th>Info</th>
                 <th class="w-1"></th>
               </tr>
             </thead>
@@ -164,23 +184,27 @@
             <input type="hidden" name="id" id="id" />
             <div class="mb-3">
               <label class="form-label">Name</label>
-              <input type="text" class="form-control" name="name" id="name" placeholder="Device name" required autocomplete="off" />
+              <input type="text" class="form-control" name="name" id="name" placeholder="Device name" required
+                autocomplete="off" />
             </div>
             <div class="mb-3">
               <label class="form-label">Comment</label>
-              <textarea name="comment" id="comment" rows="2" class="form-control" placeholder="Device comment or note"></textarea>
+              <textarea name="comment" id="comment" rows="2" class="form-control"
+                placeholder="Device comment or note"></textarea>
             </div>
             <div class="row">
               <div class="col-lg-6">
                 <div class="mb-3">
                   <label class="form-label">Latitude</label>
-                  <input type="text" value="0" class="form-control" name="latitude" id="latitude" placeholder="Device Latitude" autocomplete="off" />
+                  <input type="text" value="0" class="form-control" name="latitude" id="latitude"
+                    placeholder="Device Latitude" autocomplete="off" />
                 </div>
               </div>
               <div class="col-lg-6">
                 <div class="mb-3">
                   <label class="form-label">Longitude</label>
-                  <input type="text" value="0" class="form-control" name="longitude" id="longitude" placeholder="Device Longitude" autocomplete="off" />
+                  <input type="text" value="0" class="form-control" name="longitude" id="longitude"
+                    placeholder="Device Longitude" autocomplete="off" />
                 </div>
               </div>
             </div>
@@ -204,7 +228,8 @@
                   Wireless ?
                 </span>
                 <span class="form-check-description">
-                  Device has wireless interface that can be monitor with SNMP service. Currently support: MikroTik or UBNT wireless device
+                  Device has wireless interface that can be monitor with SNMP service. Currently support: MikroTik or
+                  UBNT wireless device
                 </span>
               </label>
             </div>
@@ -214,13 +239,15 @@
               <div class="col-lg-6">
                 <div class="mb-3">
                   <label class="form-label">Connect To</label>
-                  <input type="text" class="form-control" name="connect-to" id="connect-to" placeholder="Device IP or domain" required autocomplete="off" />
+                  <input type="text" class="form-control" name="connect-to" id="connect-to"
+                    placeholder="Device IP or domain" required autocomplete="off" />
                 </div>
               </div>
               <div class="col-lg-6">
                 <div class="mb-3">
                   <label class="form-label">SNMP Community</label>
-                  <input type="text" class="form-control" name="snmp-community" id="snmp-community" placeholder="SNMP Community" value="public" autocomplete="off" />
+                  <input type="text" class="form-control" name="snmp-community" id="snmp-community"
+                    placeholder="SNMP Community" value="public" autocomplete="off" />
                 </div>
               </div>
             </div>
@@ -229,7 +256,9 @@
             <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">Cancel</a>
             <button class="btn btn-primary ms-auto" type="submit">
               <span class="spinner-border spinner-border-sm me-2 state-loading d-none" role="status"></span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-device-floppy state-normal" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FFFFFF" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-device-floppy state-normal"
+                width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FFFFFF" fill="none"
+                stroke-linecap="round" stroke-linejoin="round">
                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                 <path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" />
                 <circle cx="12" cy="14" r="2" />
@@ -249,7 +278,9 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         <div class="modal-status bg-danger"></div>
         <div class="modal-body text-center py-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg" width="24" height="24"
+            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+            stroke-linejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
             <path d="M12 9v2m0 4v.01" />
             <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" />
@@ -268,7 +299,8 @@
                 <a href="#" class="btn btn-white w-100" data-bs-dismiss="modal">Cancel</a>
               </div>
               <div class="col">
-                <a href="javascript:void(0)" id="button-confirm-delete" class="btn btn-danger w-100" onclick="destroy(null, true)">
+                <a href="javascript:void(0)" id="button-confirm-delete" class="btn btn-danger w-100"
+                  onclick="destroy(null, true)">
                   <span class="spinner-border spinner-border-sm me-2 state-loading d-none" role="status"></span> Delete
                 </a>
               </div>
@@ -291,6 +323,7 @@
     var modalDiscover = new bootstrap.Modal(
       document.getElementById('modal-discover')
     );
+    var discoveredDevices = [];
     docReady(function () {
       load();
       loadAll();
@@ -307,18 +340,71 @@
         return;
       }
 
-      document.querySelector('#table-discovery tbody').innerHTML = `<tr><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td></tr>`;
+      document.getElementById('device-keyword').value = '';
+
+      document.querySelector('#table-discovery tbody').innerHTML =
+        `<tr><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td></tr>`;
 
       axios.get(`/tool/${source}/?json=true`).then(function (response) {
-        let tbody = '';
-        if (response.data.data.length > 0) {
-          response.data.data.forEach(function (data) {
-            let name, comment, connectTo = '';
-            name = data['host-name'] ? data['host-name'] : '';
-            comment = data['comment'] ? data['comment'] : '';
-            connectTo = data['address'] ? data['address'] : '';
-            name = !name && comment ? comment : name;
-            tbody += `<tr>
+        discoveredDevices = response.data.data;
+        renderDevice(discoveredDevices);
+      }).catch(function (error) {
+
+      })
+    }
+
+    function filterDevice(keyword) {
+      if (keyword.length <= 0){
+        renderDevice(discoveredDevices);
+        return;
+      }
+      filteredDevice = [];
+      discoveredDevices.forEach(function(device){
+        let c1 = device['host-name'] ? device['host-name'].toLowerCase().includes(keyword.toLowerCase()) : false;
+        let c2 = device['comment'] ? device['comment'].toLowerCase().includes(keyword.toLowerCase()) : false;
+        let c3 = device['address'] ? device['address'].toLowerCase().includes(keyword.toLowerCase()) : false;
+        let c4 = device['board'] ? device['board'].toLowerCase().includes(keyword.toLowerCase()) : false;
+        let c5 = device['identity'] ? device['identity'].toLowerCase().includes(keyword.toLowerCase()) : false;
+        let c6 = device['system-description'] ? device['system-description'].toLowerCase().includes(keyword.toLowerCase()) : false;
+        let c7 = device['mac-address'] ? device['mac-address'].toLowerCase().includes(keyword.toLowerCase()) : false;
+        if (c1 || c2 || c3 || c4 || c5 || c6 || c7){
+          filteredDevice.push(device);
+        }
+      });
+      renderDevice(filteredDevice);
+    }
+
+    function renderDevice(data) {
+      let tbody = '';
+      if (data.length > 0) {
+        data.forEach(function (d) {
+          let name, comment, connectTo, info = '';
+          name = d['host-name'] ? d['host-name'] : '';
+          comment = d['comment'] ? d['comment'] : '';
+          connectTo = d['address'] ? d['address'] : '';
+          name = !name && comment ? comment : name;
+          if (d.identity){
+            info += 'Identity: ' + d.identity + '<br>';
+            if (name.length <= 0){
+              name = d.identity;
+            }
+          } 
+          if (d.board){
+            info += 'Borad: ' + d.board + '<br>';
+          }
+          if (d['system-description']){
+            info += 'System Desc: ' + d['system-description'] + '<br>';
+          }
+          if (d['host-name']){
+            info += 'Hostname: ' + d['host-name'] + '<br>';
+            if (name.length <= 0){
+              name = d['host-name'];
+            }
+          }
+          if (d['mac-address']){
+            info += 'MAC: ' + d['mac-address'] + '<br>';
+          }
+          tbody += `<tr>
             <td>
               <div class="font-weight-medium">${name}</div>
               <div class="text-muted"><span class="text-reset">${comment}</span></div>
@@ -326,16 +412,17 @@
             <td>
               <div>${connectTo}</div>${data['mac-address'] ? '<div class="text-muted">' + data['mac-address'] + '</div>' : ''}
             </td>
+            <td>
+              ${info}
+            </td>
             <td><button type="button" class="btn btn-primary" onclick='addDevice(${JSON.stringify({ name: name, comment: comment, connectTo: connectTo })})'>Add Device</button></td>
           </tr>`;
-          });
-        } else {
-          tbody = `<tr><td colspan="3"><div class="empty"><div class="empty-img"><img src="/assets/vendor/tabler/static/illustrations/undraw_quitting_time_dm8t.svg" height="128" alt=""></div><p class="empty-title">No results found</p><p class="empty-subtitle text-muted"> Try adjusting your search or filter to find what you're looking for.</p></div></td></tr>`;
-        }
-        document.querySelector('#table-discovery tbody').innerHTML = tbody;
-      }).catch(function (error) {
-
-      })
+        });
+      } else {
+        tbody =
+          `<tr><td colspan="3"><div class="empty"><div class="empty-img"><img src="/assets/vendor/tabler/static/illustrations/undraw_quitting_time_dm8t.svg" height="128" alt=""></div><p class="empty-title">No results found</p><p class="empty-subtitle text-muted"> Try adjusting your search or filter to find what you're looking for.</p></div></td></tr>`;
+      }
+      document.querySelector('#table-discovery tbody').innerHTML = tbody;
     }
 
     function addDevice(device) {
@@ -368,7 +455,8 @@
       // Reset Table
       document.querySelector('#table-device tbody').innerHTML = '';
       // Set table loading
-      document.querySelector('#table-device tbody').innerHTML = `<tr><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td></tr>`;
+      document.querySelector('#table-device tbody').innerHTML =
+        `<tr><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td><td><div class="skeleton-line"></div><div class="skeleton-line"></div></td></tr>`;
 
       // Do request
       let size = document.getElementById('size').value;
@@ -391,7 +479,9 @@
               document.getElementById('shown-items-info').innerHTML = '';
             } else {
               let firstIndexRow = (currentPage - 1) * parseInt(size);
-              document.getElementById('shown-items-info').innerHTML = response.data.data.rows.length > 0 ? `${firstIndexRow + 1} - ${firstIndexRow + response.data.data.rows.length} of ${response.data.data.count} Items` : `0 Item`;
+              document.getElementById('shown-items-info').innerHTML = response.data.data.rows.length > 0 ?
+                `${firstIndexRow + 1} - ${firstIndexRow + response.data.data.rows.length} of ${response.data.data.count} Items` :
+                `0 Item`;
 
               let totalPage = Math.ceil(response.data.data.count / size);
               /* beautify preserve:start */
@@ -409,9 +499,11 @@
               let pagination = prevButton;
               for (let i = 1; i <= totalPage; i++) {
                 if (i == currentPage) {
-                  pagination += `<li class="page-item active"><a class="page-link" href="javascript:void(0)" onclick='load(${i})'>${i}</a></li>`;
+                  pagination +=
+                    `<li class="page-item active"><a class="page-link" href="javascript:void(0)" onclick='load(${i})'>${i}</a></li>`;
                 } else {
-                  pagination += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick='load(${i})'>${i}</a></li>`;
+                  pagination +=
+                    `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick='load(${i})'>${i}</a></li>`;
                 }
               }
               pagination += nextButton;
@@ -504,7 +596,8 @@
       document.querySelector('#modal-delete-device .device-name').innerHTML = device.name;
       // Trigger confirmation modal
       modalDeleteDevice.show();
-      document.getElementById('button-confirm-delete').setAttribute('onclick', `destroy(${JSON.stringify(device)}, true)`);
+      document.getElementById('button-confirm-delete').setAttribute('onclick',
+        `destroy(${JSON.stringify(device)}, true)`);
       if (deleteImmediately) {
         // Set loading
         setConfirmationButtonLoadingState(true);
