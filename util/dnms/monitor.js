@@ -27,6 +27,9 @@ module.exports.server = async (socket, payload) => {
 };
 
 module.exports.device = async (socket, payload) => {
+  if (payload.device.length <= 0){
+    return;
+  }
   const serverId = socket.handshake.session.serverId;
   const server = await Server.findOne({
     where: {
